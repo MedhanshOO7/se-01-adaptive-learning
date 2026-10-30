@@ -10,22 +10,24 @@ import { FONT_CSS } from './fonts.ts';
 
 export const THEME_CSS = FONT_CSS + `
 :root{
+  color-scheme:dark;
+  /* Dark-but-not-deep base: a plum-charcoal paper with surfaces that lift clearly above it
+     (so cards/panels read as separate layers) and visible borders. High-contrast near-white ink. */
+  --paper:#221f2a; --surface:#332f40; --surface-2:#413b4e;
+  --ink:#f6f1f5; --muted:#cabcc5; --line:#53495f;
+  --brand:#f56c9b; --brand-2:#f09065; --brand-ink:#231820;
+  --ok:#3bd6c4; --bad:#ff6f97;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 18px 40px -20px rgba(245,108,155,.3);
+  --sans:"UbuntuSE","Ubuntu","Cantarell","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+}
+/* Light palette is opt-in only (data-theme="light"); the app is dark by default. */
+:root[data-theme="light"]{
   color-scheme:light;
-  /* Base blended from two random colors (#e86487 + #636470 → #a6647c), mid lightness. */
   --paper:#988f92; --surface:#f7f1f4; --surface-2:#eadfe5;
   --ink:#2e1a21; --muted:#80606c; --line:#eadce1;
   --brand:#c9366b; --brand-2:#ba5a36; --brand-ink:#ffffff;
   --ok:#0e8f8a; --bad:#d6436b;
   --shadow:0 1px 2px rgba(46,26,33,.05), 0 12px 32px -16px rgba(201,54,107,.20);
-  --sans:"UbuntuSE","Ubuntu","Cantarell","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
-}
-/* Dark palette is opt-in only (data-theme="dark"); the app forces light by default. */
-:root[data-theme="dark"]{
-  --paper:#533c44; --surface:#604851; --surface-2:#6d545d;
-  --ink:#f4f1f2; --muted:#cdc1c5; --line:#81656f;
-  --brand:#e07199; --brand-2:#d1876c; --brand-ink:#2e1a21;
-  --ok:#49cfc6; --bad:#ff7aa0;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(224,113,153,.28);
 }
 
 *{box-sizing:border-box}
@@ -35,11 +37,11 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   background-image:radial-gradient(120% 80% at 85% -10%, color-mix(in srgb,var(--brand) 16%,transparent), transparent 60%),
     radial-gradient(90% 60% at -10% 0%, color-mix(in srgb,var(--brand-2) 14%,transparent), transparent 55%);
   background-attachment:fixed;}
-/* +20% white wash over the background (app is light by default). */
+/* Brand glow over a deepening vignette (keeps the dark base from reading flat). */
 body{
-  background-image:linear-gradient(rgba(255,255,255,.08),rgba(255,255,255,.08)),
-    radial-gradient(120% 80% at 85% -10%, color-mix(in srgb,var(--brand) 16%,transparent), transparent 60%),
-    radial-gradient(90% 60% at -10% 0%, color-mix(in srgb,var(--brand-2) 14%,transparent), transparent 55%);
+  background-image:radial-gradient(120% 80% at 85% -10%, color-mix(in srgb,var(--brand) 22%,transparent), transparent 60%),
+    radial-gradient(90% 60% at -10% 0%, color-mix(in srgb,var(--brand-2) 18%,transparent), transparent 55%),
+    linear-gradient(rgba(0,0,0,.14),rgba(0,0,0,.14));
 }
 main{max-width:720px;margin:0 auto;padding:40px 20px 96px}
 h1{font-size:clamp(2rem,4.4vw,2.9rem);line-height:1.04;font-weight:700;letter-spacing:-0.035em;margin:.1em 0 .25em}

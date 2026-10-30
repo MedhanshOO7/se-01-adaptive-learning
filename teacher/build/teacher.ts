@@ -18,19 +18,23 @@ const CSS = THEME_CSS;
 // base #c399e4, a violet→magenta) plus a Spline-style animated gradient-blob hero.
 const TEACHER_CSS = `
 :root{
+  color-scheme:dark;
+  /* Dark-but-not-deep teacher base: an olive-charcoal paper with surfaces that lift clearly above it
+     (so cards/panels read as separate layers) and visible borders. High-contrast near-white ink. */
+  --paper:#20231a; --surface:#2f3426; --surface-2:#3b4130;
+  --ink:#f2f4ed; --muted:#bdc4b0; --line:#4d543c;
+  --brand:#bce466; --brand-2:#74d76e; --brand-ink:#1a1e11;
+  --ok:#3bd6c4; --bad:#ff6f97;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 18px 40px -20px rgba(188,228,102,.32);
+}
+/* Teacher light palette opt-in only; dark by default. */
+:root[data-theme="light"]{
+  color-scheme:light;
   --paper:#959b8b; --surface:#f5f8ee; --surface-2:#e5ecd8;
   --ink:#282e1a; --muted:#778060; --line:#e6eadc;
   --brand:#a1c936; --brand-2:#42ba36; --brand-ink:#282e1a;
   --ok:#0e8f8a; --bad:#d6436b;
   --shadow:0 1px 2px rgba(40,46,26,.05), 0 14px 34px -16px rgba(161,201,54,.24);
-}
-/* Teacher dark palette opt-in only; light forced by default. */
-:root[data-theme="dark"]{
-  --paper:#4d533c; --surface:#5a6048; --surface-2:#676d54;
-  --ink:#f3f4f1; --muted:#c9cdc1; --line:#798165;
-  --brand:#c2e071; --brand-2:#75d16c; --brand-ink:#282e1a;
-  --ok:#49cfc6; --bad:#ff7aa0;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(194,224,113,.3);
 }
 /* Spline-style fluid hero: drifting, blurred gradient blobs over a dark base. */
 .t-hero{position:relative;overflow:hidden;border-radius:24px;padding:38px 30px;margin:6px 0 24px;
