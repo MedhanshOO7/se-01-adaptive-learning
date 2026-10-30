@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "id": "structure-of-the-atom-check",
+  "title": "Check your understanding",
+  "questions": [
+    {
+      "q": "Who discovered the electron?",
+      "options": ["J. J. Thomson", "Ernest Rutherford", "Niels Bohr", "James Chadwick"],
+      "answer": 0,
+      "explanation": "J. J. Thomson discovered the electron. Chadwick discovered the neutron; Rutherford and Bohr proposed atomic models.",
+      "skill": "subatomic-particles",
+      "difficulty": "core"
+    },
+    {
+      "q": "In Thomson's model, the atom is described as…",
+      "options": ["A sphere of positive charge with electrons embedded in it", "A tiny dense nucleus with electrons far away", "Electrons in fixed energy shells", "Equal protons and neutrons with no electrons"],
+      "answer": 0,
+      "explanation": "Thomson pictured a positive sphere with electrons embedded, like seeds in a watermelon.",
+      "skill": "atomic-models",
+      "difficulty": "core"
+    },
+    {
+      "q": "In the gold-foil experiment, most alpha particles passed straight through because…",
+      "options": ["Most of the atom is empty space", "The foil had holes in it", "Alpha particles are negatively charged", "The nucleus is very large"],
+      "answer": 0,
+      "explanation": "Only a few particles deflected, showing the atom is mostly empty with a small dense nucleus.",
+      "skill": "atomic-models",
+      "difficulty": "core"
+    },
+    {
+      "q": "How many electrons can the M shell (n = 3) hold at most?",
+      "options": ["18", "8", "2", "32"],
+      "answer": 0,
+      "explanation": "Maximum per shell is 2n²; for n = 3 that is 2 × 3² = 18.",
+      "skill": "electron-distribution",
+      "difficulty": "core"
+    },
+    {
+      "q": "An atom has 2 electrons in its outermost shell. These 2 electrons are called its…",
+      "options": ["Valence electrons", "Core electrons", "Neutrons", "Isotopes"],
+      "answer": 0,
+      "explanation": "Electrons in the outermost shell are valence electrons; they decide valency.",
+      "skill": "valency",
+      "difficulty": "core"
+    },
+    {
+      "q": "An atom has atomic number 11 and mass number 23. How many neutrons does it have?",
+      "options": ["12", "11", "23", "34"],
+      "answer": 0,
+      "explanation": "Neutrons = mass number − atomic number = 23 − 11 = 12.",
+      "skill": "atomic-number-mass-number",
+      "difficulty": "core"
+    },
+    {
+      "q": "Carbon-12 and carbon-14 are examples of…",
+      "options": ["Isotopes", "Isobars", "Ions", "Isomers"],
+      "answer": 0,
+      "explanation": "Same element (same atomic number), different mass numbers → isotopes.",
+      "skill": "isotopes-isobars",
+      "difficulty": "core"
+    },
+    {
+      "q": "Calcium-40 and argon-40 have the same mass number but different atomic numbers. They are…",
+      "options": ["Isobars", "Isotopes", "The same element", "Noble gases"],
+      "answer": 0,
+      "explanation": "Different elements with the same mass number are isobars.",
+      "skill": "isotopes-isobars",
+      "difficulty": "core"
+    }
+  ]
+}

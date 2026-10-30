@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "structure-of-the-atom",
+  "revision": "1",
+  "title": "Structure of the Atom",
+  "language": "en",
+  "lesson": "chapter.md",
+  "quizzes": ["quiz/1.json"],
+  "skills": "skills.json"
+}
