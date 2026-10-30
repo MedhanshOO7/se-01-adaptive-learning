@@ -116,15 +116,20 @@ export async function buildDemo(bundleDir: string, outFile: string): Promise<str
 ${lessonHtml}
 <p class="hint">Answer below. Get one wrong on purpose to see the app step back to a prerequisite.</p>
 ${quizHtml}
-<div class="panel">
-  <strong>Your skill map</strong>
-  <span class="status" id="integrity"></span>
-  <div class="model" id="model"></div>
-  <div class="map-legend"><span><span class="dot solid"></span> solid</span><span><span class="dot needs-work"></span> needs practice</span><span><span class="dot unseen"></span> not seen</span></div>
-  <button id="show">Show raw record</button>
-  <button id="tamper">Simulate tampering</button>
-  <button id="reset">Reset</button>
-  <div id="record"></div>
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <strong>Your skill map</strong>
+    <span class="status" id="integrity"></span>
+    <button id="toggle" aria-expanded="true">Hide</button>
+  </div>
+  <div class="panel-body">
+    <div class="model" id="model"></div>
+    <div class="map-legend"><span><span class="dot solid"></span> solid</span><span><span class="dot needs-work"></span> needs practice</span><span><span class="dot unseen"></span> not seen</span></div>
+    <button id="show">Show raw record</button>
+    <button id="tamper">Simulate tampering</button>
+    <button id="reset">Reset</button>
+    <div id="record"></div>
+  </div>
 </div>
 </main>
 <script>${MRMD_SHIM}</script>
@@ -163,6 +168,13 @@ document.getElementById('tamper').onclick=async function(){
       os.put('AAAA:BBBB',keys[0]).onsuccess=function(){document.getElementById('record').textContent='(edited the first stored record directly)';refresh();};};};
 };
 document.getElementById('reset').onclick=function(){indexedDB.deleteDatabase('se01:'+CONFIG.chapterId);location.reload();};
+document.getElementById('toggle').onclick=function(){
+  const p=document.getElementById('panel');const collapsed=p.classList.toggle('collapsed');
+  this.textContent=collapsed?'Show':'Hide';this.setAttribute('aria-expanded',String(!collapsed));
+  try{localStorage.setItem('se01:panelHidden',collapsed?'1':'0');}catch(e){}
+};
+try{if(localStorage.getItem('se01:panelHidden')==='1'){document.getElementById('panel').classList.add('collapsed');
+  const t=document.getElementById('toggle');t.textContent='Show';t.setAttribute('aria-expanded','false');}}catch(e){}
 </script>
 </body></html>`;
 

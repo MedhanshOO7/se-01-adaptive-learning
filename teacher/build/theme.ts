@@ -137,6 +137,13 @@ a.back:hover{text-decoration:underline}
 .panel,.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;
   padding:18px 22px;box-shadow:var(--shadow)}
 .panel{position:sticky;bottom:14px;margin-top:40px}
+.panel-head{display:flex;align-items:center;gap:10px}
+.panel #toggle{margin-left:auto;font:inherit;font-weight:650;padding:6px 14px;border:1.5px solid var(--line);
+  border-radius:999px;background:var(--surface-2);color:inherit;cursor:pointer}
+.panel #toggle:hover{border-color:var(--brand)}
+.panel-body{margin-top:12px}
+.panel.collapsed{box-shadow:var(--shadow)}
+.panel.collapsed .panel-body{display:none}
 .panel strong,.card h2{font-size:1.05rem}
 .panel button{font:inherit;font-weight:600;margin:10px 8px 0 0;padding:8px 14px;border:1.5px solid var(--line);
   border-radius:10px;background:var(--surface-2);color:inherit;cursor:pointer;transition:border-color .15s}
