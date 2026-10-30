@@ -24,14 +24,14 @@ const TEACHER_CSS = `
   --ok:#0e8f8a; --bad:#d6436b;
   --shadow:0 1px 2px rgba(34,23,43,.05), 0 14px 34px -16px rgba(141,57,208,.24);
 }
-@media (prefers-color-scheme:dark){:root{
-  /* dark surfaces lightened by +20% white (was too dark) */
+/* Teacher dark palette opt-in only; light forced by default. */
+:root[data-theme="dark"]{
   --paper:#433d47; --surface:#4c4551; --surface-2:#554d5b;
   --ink:#f3f0f5; --muted:#c6bdce; --line:#6b6173;
   --brand:#b97de8; --brand-2:#d978c3; --brand-ink:#140d19;
   --ok:#49cfc6; --bad:#ff7aa0;
   --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(185,125,232,.3);
-}}
+}
 /* Spline-style fluid hero: drifting, blurred gradient blobs over a dark base. */
 .t-hero{position:relative;overflow:hidden;border-radius:24px;padding:38px 30px;margin:6px 0 24px;
   background:#160d1e;box-shadow:var(--shadow);isolation:isolate}

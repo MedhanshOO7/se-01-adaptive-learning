@@ -10,7 +10,7 @@ import { FONT_CSS } from './fonts.ts';
 
 export const THEME_CSS = FONT_CSS + `
 :root{
-  color-scheme:light dark;
+  color-scheme:light;
   /* Base hue blended from two random colors (#913383 + #5de94d → #778e68). */
   --paper:#fbfcfa; --surface:#ffffff; --surface-2:#f8fbf6;
   --ink:#1f2a18; --muted:#728367; --line:#e4ecdf;
@@ -19,14 +19,14 @@ export const THEME_CSS = FONT_CSS + `
   --shadow:0 1px 2px rgba(31,42,24,.05), 0 12px 32px -16px rgba(63,202,87,.20);
   --sans:"UbuntuSE","Ubuntu","Cantarell","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
 }
-@media (prefers-color-scheme:dark){:root{
-  /* dark surfaces lightened by +20% white (was too dark) */
+/* Dark palette is opt-in only (data-theme="dark"); the app forces light by default. */
+:root[data-theme="dark"]{
   --paper:#41473d; --surface:#4a5145; --surface-2:#525b4d;
   --ink:#f3f5f0; --muted:#c3ccbd; --line:#687560;
   --brand:#a8e77e; --brand-2:#79d78a; --brand-ink:#12190d;
   --ok:#49cfc6; --bad:#ff7aa0;
   --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(168,231,126,.28);
-}}
+}
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -35,12 +35,12 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   background-image:radial-gradient(120% 80% at 85% -10%, color-mix(in srgb,var(--brand) 16%,transparent), transparent 60%),
     radial-gradient(90% 60% at -10% 0%, color-mix(in srgb,var(--brand-2) 14%,transparent), transparent 55%);
   background-attachment:fixed;}
-/* +20% white wash over the background (light mode only — keeps dark depth intact) */
-@media (prefers-color-scheme:light){body{
+/* +20% white wash over the background (app is light by default). */
+body{
   background-image:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,.2)),
     radial-gradient(120% 80% at 85% -10%, color-mix(in srgb,var(--brand) 16%,transparent), transparent 60%),
     radial-gradient(90% 60% at -10% 0%, color-mix(in srgb,var(--brand-2) 14%,transparent), transparent 55%);
-}}
+}
 main{max-width:720px;margin:0 auto;padding:40px 20px 96px}
 h1{font-size:clamp(2rem,4.4vw,2.9rem);line-height:1.04;font-weight:700;letter-spacing:-0.035em;margin:.1em 0 .25em}
 h2{font-size:1.3rem;font-weight:700;letter-spacing:-0.022em;margin:1.9em 0 .4em}
