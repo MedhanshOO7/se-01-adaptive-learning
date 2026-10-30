@@ -18,7 +18,7 @@ const CSS = THEME_CSS;
 // base #c399e4, a violet→magenta) plus a Spline-style animated gradient-blob hero.
 const TEACHER_CSS = `
 :root{
-  --paper:#eff1ea; --surface:#ffffff; --surface-2:#f7f9f1;
+  --paper:#e3e7da; --surface:#ffffff; --surface-2:#f1f4ea;
   --ink:#282e1a; --muted:#778060; --line:#e6eadc;
   --brand:#a1c936; --brand-2:#42ba36; --brand-ink:#282e1a;
   --ok:#0e8f8a; --bad:#d6436b;
