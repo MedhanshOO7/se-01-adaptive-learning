@@ -20,11 +20,12 @@ export const THEME_CSS = FONT_CSS + `
   --sans:"UbuntuSE","Ubuntu","Cantarell","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root{
-  --paper:#12190d; --surface:#1d2617; --surface-2:#273220;
-  --ink:#edf0ea; --muted:#a6b39e; --line:#36432d;
+  /* dark surfaces lightened by +20% white (was too dark) */
+  --paper:#41473d; --surface:#4a5145; --surface-2:#525b4d;
+  --ink:#f3f5f0; --muted:#c3ccbd; --line:#687560;
   --brand:#a8e77e; --brand-2:#79d78a; --brand-ink:#12190d;
   --ok:#49cfc6; --bad:#ff7aa0;
-  --shadow:0 1px 2px rgba(0,0,0,.35), 0 18px 40px -20px rgba(168,231,126,.28);
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(168,231,126,.28);
 }}
 
 *{box-sizing:border-box}
