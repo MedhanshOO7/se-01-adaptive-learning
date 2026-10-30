@@ -6,7 +6,9 @@
 // atom / constellation). One orchestrated motion: a pulse travelling BACK along a link = the
 // app stepping back to a prerequisite. Everything else stays quiet. Reduced-motion freezes it.
 
-export const THEME_CSS = `
+import { FONT_CSS } from './fonts.ts';
+
+export const THEME_CSS = FONT_CSS + `
 :root{
   color-scheme:light dark;
   /* Base hue blended from two random colors (#913383 + #5de94d → #778e68). */
@@ -15,7 +17,7 @@ export const THEME_CSS = `
   --brand:#5fae2e; --brand-2:#3fca57; --brand-ink:#ffffff;
   --ok:#0e8f8a; --bad:#d6436b;
   --shadow:0 1px 2px rgba(31,42,24,.05), 0 12px 32px -16px rgba(63,202,87,.20);
-  --sans:"Inter","Cantarell","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",sans-serif;
+  --sans:"UbuntuSE","Ubuntu","Cantarell","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root{
   --paper:#12190d; --surface:#1d2617; --surface-2:#273220;
@@ -39,8 +41,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
     radial-gradient(90% 60% at -10% 0%, color-mix(in srgb,var(--brand-2) 14%,transparent), transparent 55%);
 }}
 main{max-width:720px;margin:0 auto;padding:40px 20px 96px}
-h1{font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.05;font-weight:800;letter-spacing:-0.03em;margin:.1em 0 .25em}
-h2{font-size:1.28rem;font-weight:750;letter-spacing:-0.02em;margin:1.9em 0 .4em}
+h1{font-size:clamp(2rem,4.4vw,2.9rem);line-height:1.04;font-weight:700;letter-spacing:-0.035em;margin:.1em 0 .25em}
+h2{font-size:1.3rem;font-weight:700;letter-spacing:-0.022em;margin:1.9em 0 .4em}
 h3{font-size:1.05rem;font-weight:700;margin:1.4em 0 .3em}
 p{margin:.7em 0}
 a{color:inherit}
@@ -77,7 +79,11 @@ a.back:hover{text-decoration:underline}
 .tile{display:flex;align-items:center;gap:16px;text-decoration:none;color:inherit;
   background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;
   box-shadow:var(--shadow);transition:transform .18s ease, border-color .18s ease}
-.tile:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--brand) 45%,var(--line))}
+.tile:hover{transform:translateY(-3px) scale(1.01);border-color:color-mix(in srgb,var(--brand) 45%,var(--line));
+  box-shadow:0 2px 4px rgba(0,0,0,.04), 0 22px 48px -22px color-mix(in srgb,var(--brand) 55%,transparent)}
+.hero,.tile{animation:riseIn .6s both cubic-bezier(.2,.75,.25,1)}
+.tile:nth-child(1){animation-delay:.06s}.tile:nth-child(2){animation-delay:.13s}.tile:nth-child(3){animation-delay:.2s}
+@keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .tile .ic{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
   background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand);font-weight:800}
 .tile.teacher .ic{background:color-mix(in srgb,var(--brand-2) 18%,transparent);color:color-mix(in srgb,var(--brand-2) 70%,var(--ink))}
@@ -107,8 +113,18 @@ a.back:hover{text-decoration:underline}
 .bk-opt:hover:not(:disabled){border-color:var(--brand);transform:translateY(-1px)}
 .bk-opt:active:not(:disabled){transform:translateY(0)}
 .bk-opt:disabled{cursor:default}
-.bk-opt.correct{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,var(--surface));font-weight:650}
-.bk-opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 13%,var(--surface))}
+.bk-opt{position:relative}
+.bk-opt.correct{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,var(--surface));font-weight:650;
+  animation:pop .4s cubic-bezier(.3,1.4,.5,1)}
+.bk-opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 13%,var(--surface));
+  animation:shake .4s ease}
+.bk-opt.correct::after{content:"✓";position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:var(--ok);font-weight:800;animation:fadein .3s .1s both}
+.bk-opt.wrong::after{content:"✗";position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:var(--bad);font-weight:800;animation:fadein .3s both}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.035)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@keyframes fadein{from{opacity:0;transform:translateY(-50%) scale(.6)}to{opacity:1;transform:translateY(-50%) scale(1)}}
 .bk-opt.disabled{opacity:.45}
 .bk-exp,.se01-explanation{margin-top:12px;padding:10px 14px;border-radius:10px;
   background:var(--surface-2);color:var(--muted);font-size:.95rem}
@@ -131,7 +147,8 @@ a.back:hover{text-decoration:underline}
 .model .row:first-child{border-top:0}
 .dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 0 4px color-mix(in srgb,currentColor 18%,transparent)}
 .dot.solid{background:var(--ok);color:var(--ok)}
-.dot.needs-work{background:var(--bad);color:var(--bad)}
+.dot.needs-work{background:var(--bad);color:var(--bad);animation:dotpulse 1.7s ease-in-out infinite}
+@keyframes dotpulse{0%,100%{box-shadow:0 0 0 4px color-mix(in srgb,var(--bad) 18%,transparent)}50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--bad) 8%,transparent)}}
 .dot.unseen{background:var(--line);color:var(--line);box-shadow:none}
 .lbl{flex:1}.st{color:var(--muted);font-size:.85rem}
 #record{margin-top:12px;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:12px;color:var(--muted)}
