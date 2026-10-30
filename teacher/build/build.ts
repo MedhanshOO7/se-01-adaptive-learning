@@ -62,7 +62,7 @@ function runMrMd(lessonPath: string, outDir: string): void {
 /** Newest .html under a directory (mr-md's output filename isn't fixed across versions). */
 function newestHtml(dir: string): string {
   const htmls = readdirSync(dir)
-    .filter((f) => f.endsWith('.html'))
+    .filter((f) => f.endsWith('.html') && f !== 'demo.html') // demo.html is our own artifact
     .map((f) => join(dir, f));
   if (htmls.length === 0) throw new Error(`mr-md produced no .html file in ${dir}.`);
   return htmls.sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)[0];

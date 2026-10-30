@@ -86,11 +86,13 @@ export function wireRuntime(config: RuntimeConfig, store: EventStore): () => voi
 
     const prereqQuiz = questionEl.closest<HTMLElement>('.bk-quiz[data-se01-prereq]');
     if (prereqQuiz) {
-      // A follow-up question we injected: metadata is on the element.
+      // A follow-up question we injected: metadata is on the element. The question index is
+      // taken from the element id (`se01-prereq-<n>-q0`) so it is stable per follow-up.
       const skillId = prereqQuiz.dataset.skill || null;
       const answer = Number(prereqQuiz.dataset.answer);
       const correct = selectedOption === answer;
-      await store.append({ quizId: 'prereq', questionIndex: followupCount, skillId, selectedOption, correct });
+      const index = Number(questionEl.id.match(/se01-prereq-(\d+)-q0$/)?.[1] ?? followupCount);
+      await store.append({ quizId: 'prereq', questionIndex: index, skillId, selectedOption, correct });
       if (correct && skillId) masteredSkills.add(skillId);
       else if (!correct && skillId) remediate(skillId, prereqQuiz);
       return;
@@ -130,9 +132,12 @@ export function wireRuntime(config: RuntimeConfig, store: EventStore): () => voi
 
   const handler = (e: Event) => {
     const btn = (e.target as HTMLElement).closest?.('.bk-opt') as HTMLButtonElement | null;
-    if (!btn || btn.disabled) return;
+    if (!btn) return;
+    // NB: do NOT bail on `btn.disabled`. mr-md's own quiz listener runs first and disables the
+    // buttons synchronously, so by the time this (later-registered) listener runs the button is
+    // already disabled. Dedup on the question id via `recorded` instead.
     const questionEl = btn.closest<HTMLElement>('.bk-question');
-    if (!questionEl) return;
+    if (!questionEl || recorded.has(questionEl.id)) return;
     void onAnswer(questionEl, Number(btn.dataset.optIdx));
   };
 

@@ -157,30 +157,40 @@ export async function openEventStore(opts: {
     return { events };
   }
 
+  async function doAppend(input: AppendInput): Promise<EvidenceEvent> {
+    const { events } = await read(true); // refuse to append onto a broken chain
+    const prev = events.at(-1);
+    const priorForQuestion = events.filter(
+      (e) => e.quizId === input.quizId && e.questionIndex === input.questionIndex,
+    ).length;
+    const base: Omit<EvidenceEvent, 'hash'> = {
+      eventId: idFactory(),
+      chapterId,
+      chapterRevision,
+      quizId: input.quizId,
+      questionIndex: input.questionIndex,
+      skillId: input.skillId,
+      selectedOption: input.selectedOption,
+      correct: input.correct,
+      attemptNumber: priorForQuestion + 1,
+      independent: priorForQuestion === 0,
+      occurredAt: now(),
+      prevHash: prev?.hash ?? '',
+    };
+    const event: EvidenceEvent = { ...base, hash: await hash(base) };
+    await backend.append(await encrypt(event));
+    return event;
+  }
+
+  // Serialize appends: each read-then-write runs after the previous one resolves, so two
+  // quick clicks can't both read the same tail and write a chain-breaking pair.
+  let tail: Promise<unknown> = Promise.resolve();
+
   return {
-    async append(input) {
-      const { events } = await read(true); // refuse to append onto a broken chain
-      const prev = events.at(-1);
-      const priorForQuestion = events.filter(
-        (e) => e.quizId === input.quizId && e.questionIndex === input.questionIndex,
-      ).length;
-      const base: Omit<EvidenceEvent, 'hash'> = {
-        eventId: idFactory(),
-        chapterId,
-        chapterRevision,
-        quizId: input.quizId,
-        questionIndex: input.questionIndex,
-        skillId: input.skillId,
-        selectedOption: input.selectedOption,
-        correct: input.correct,
-        attemptNumber: priorForQuestion + 1,
-        independent: priorForQuestion === 0,
-        occurredAt: now(),
-        prevHash: prev?.hash ?? '',
-      };
-      const event: EvidenceEvent = { ...base, hash: await hash(base) };
-      await backend.append(await encrypt(event));
-      return event;
+    append(input) {
+      const op = tail.then(() => doAppend(input));
+      tail = op.catch(() => {}); // a failed append doesn't wedge the queue
+      return op;
     },
     async list() {
       return (await read(true)).events;

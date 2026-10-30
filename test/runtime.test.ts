@@ -20,6 +20,19 @@ test('store appends an append-only, verifiable hash chain', async () => {
   assert.deepEqual(await store.verify(), { ok: true });
 });
 
+test('concurrent appends stay serialized and keep the chain intact', async () => {
+  const store = await openEventStore({ backend: memoryBackend(), ...storeOpts });
+  // Fire both before awaiting either — the race a double/fast click would cause.
+  await Promise.all([
+    store.append({ quizId: 'q1', questionIndex: 0, skillId: 's', selectedOption: 0, correct: true }),
+    store.append({ quizId: 'q1', questionIndex: 1, skillId: 's', selectedOption: 0, correct: true }),
+  ]);
+  const events = await store.list();
+  assert.equal(events.length, 2);
+  assert.equal(events[1].prevHash, events[0].hash);
+  assert.deepEqual(await store.verify(), { ok: true });
+});
+
 test('a second attempt at the same question is not independent', async () => {
   const store = await openEventStore({ backend: memoryBackend(), ...storeOpts });
   await store.append({ quizId: 'q1', questionIndex: 0, skillId: 's', selectedOption: 1, correct: false });

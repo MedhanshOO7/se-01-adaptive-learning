@@ -54,6 +54,27 @@ test('a wrong answer injects a prerequisite follow-up (personalization)', async 
   assert.equal(events[0].skillId, 'equivalence');
 });
 
+test('records even when another listener disables the button first (mr-md shim order)', async () => {
+  const bundle = await loadBundle('content/fractions');
+  const dom = new JSDOM(`<body>${quizMarkup(bundle.quizzes[0].questions.map((q) => q.answer))}</body>`);
+  (globalThis as any).document = dom.window.document;
+  const doc = dom.window.document;
+  // Simulate mr-md's own listener, registered BEFORE ours, disabling the options synchronously.
+  doc.addEventListener('click', (e: any) => {
+    const btn = e.target.closest?.('.bk-opt');
+    if (!btn) return;
+    btn.closest('.bk-question').querySelectorAll('.bk-opt').forEach((b: any) => (b.disabled = true));
+  });
+  const store = await openEventStore({ backend: memoryBackend(), secret: 's', chapterId: 'c', chapterRevision: '1' });
+  wireRuntime(
+    { chapterId: 'c', chapterRevision: '1', quizzes: bundle.quizzes, skillGraph: bundle.skillGraph },
+    store,
+  );
+  clickOption(doc, 'quiz-0-q0', 0);
+  await new Promise((r) => setTimeout(r, 20));
+  assert.equal((await store.list()).length, 1, 'answer must record despite the button being disabled first');
+});
+
 test('a correct answer injects no follow-up', async () => {
   const { dom, store } = await setup();
   const doc = dom.window.document;
