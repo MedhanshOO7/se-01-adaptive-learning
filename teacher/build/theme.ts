@@ -12,7 +12,7 @@ export const THEME_CSS = FONT_CSS + `
 :root{
   color-scheme:light;
   /* Base blended from two random colors (#e86487 + #636470 → #a6647c), mid lightness. */
-  --paper:#e6dde1; --surface:#ffffff; --surface-2:#f4edf0;
+  --paper:#d9ccd1; --surface:#ffffff; --surface-2:#ede3e7;
   --ink:#2e1a21; --muted:#80606c; --line:#eadce1;
   --brand:#c9366b; --brand-2:#ba5a36; --brand-ink:#ffffff;
   --ok:#0e8f8a; --bad:#d6436b;
