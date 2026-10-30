@@ -9,18 +9,20 @@
 export const THEME_CSS = `
 :root{
   color-scheme:light dark;
-  --paper:#eef0f8; --surface:#ffffff; --surface-2:#f6f7fc;
-  --ink:#171a2b; --muted:#646782; --line:#e2e4f0;
-  --brand:#5a45ff; --brand-2:#17c4d6; --brand-ink:#ffffff;
-  --ok:#1a9d57; --bad:#d6436b;
-  --shadow:0 1px 2px rgba(23,26,43,.04), 0 12px 32px -16px rgba(90,69,255,.22);
+  /* Base hue blended from two random colors (#913383 + #5de94d → #778e68). */
+  --paper:#fbfcfa; --surface:#ffffff; --surface-2:#f8fbf6;
+  --ink:#1f2a18; --muted:#728367; --line:#e4ecdf;
+  --brand:#5fae2e; --brand-2:#3fca57; --brand-ink:#ffffff;
+  --ok:#0e8f8a; --bad:#d6436b;
+  --shadow:0 1px 2px rgba(31,42,24,.05), 0 12px 32px -16px rgba(63,202,87,.20);
   --sans:"Inter","Cantarell","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root{
-  --paper:#0b0d16; --surface:#141726; --surface-2:#1a1e30;
-  --ink:#eceef7; --muted:#9a9db6; --line:#262a3d;
-  --brand:#8f80ff; --brand-2:#4fd6e6; --brand-ink:#0b0d16;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(143,128,255,.35);
+  --paper:#12190d; --surface:#1d2617; --surface-2:#273220;
+  --ink:#edf0ea; --muted:#a6b39e; --line:#36432d;
+  --brand:#a8e77e; --brand-2:#79d78a; --brand-ink:#12190d;
+  --ok:#49cfc6; --bad:#ff7aa0;
+  --shadow:0 1px 2px rgba(0,0,0,.35), 0 18px 40px -20px rgba(168,231,126,.28);
 }}
 
 *{box-sizing:border-box}
@@ -47,7 +49,7 @@ a.back:hover{text-decoration:underline}
 
 /* ---- hero graph motif ---- */
 .hero{position:relative;margin:8px 0 28px;padding:30px 28px;border-radius:22px;overflow:hidden;
-  background:linear-gradient(135deg, color-mix(in srgb,var(--brand) 92%,#000) 0%, var(--brand) 45%, var(--brand-2) 120%);
+  background:linear-gradient(135deg, color-mix(in srgb,var(--brand) 58%, #0a1405) 0%, color-mix(in srgb,var(--brand-2) 54%, #0a1405) 100%);
   color:#fff;box-shadow:var(--shadow)}
 .hero .eyebrow{font-weight:650;font-size:.82rem;opacity:.85;margin:0}
 .hero h1{color:#fff;margin:.1em 0 .2em;max-width:14ch}
