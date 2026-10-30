@@ -12,7 +12,7 @@ export const THEME_CSS = FONT_CSS + `
 :root{
   color-scheme:light;
   /* Base blended from two random colors (#e86487 + #636470 → #a6647c), mid lightness. */
-  --paper:#fcfafb; --surface:#ffffff; --surface-2:#fbf6f8;
+  --paper:#f1ecee; --surface:#ffffff; --surface-2:#faf4f6;
   --ink:#2e1a21; --muted:#80606c; --line:#eadce1;
   --brand:#c9366b; --brand-2:#ba5a36; --brand-ink:#ffffff;
   --ok:#0e8f8a; --bad:#d6436b;
@@ -37,7 +37,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   background-attachment:fixed;}
 /* +20% white wash over the background (app is light by default). */
 body{
-  background-image:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,.2)),
+  background-image:linear-gradient(rgba(255,255,255,.08),rgba(255,255,255,.08)),
     radial-gradient(120% 80% at 85% -10%, color-mix(in srgb,var(--brand) 16%,transparent), transparent 60%),
     radial-gradient(90% 60% at -10% 0%, color-mix(in srgb,var(--brand-2) 14%,transparent), transparent 55%);
 }
