@@ -1,41 +1,66 @@
 # SE-01 — Offline Adaptive Learning
 
-Students download learning material, practise offline, and receive activities suited to their answers. Their progress reaches the teacher when they reconnect.
+Students read a curated lesson, practise, and are nudged toward the right next question
+based on what they got wrong — **entirely offline**. Teachers prepare chapters once, with
+AI help; students never need to go online.
 
-Teachers prepare and review content online, with AI assistance, before publishing it for students.
+Pilot content: Class 6 **equivalent fractions** (English).
 
-**Status:** Quiz engine implemented; student app and other engines remain to be built.
+## Two sides, one contract
 
-The standalone [quiz engine](docs/quiz-engine.md) supports seven question types, offline scoring, hints/retries, and resumable sessions. It plugs into the lesson renderer through structured question data, independently of Markdown conversion.
+The project has a **teacher side** (authoring) and a **student side** (offline learning).
+They meet at exactly one thing: a **chapter bundle**, built into a standalone HTML file.
 
-```sh
-npm test
-npm run demo:quiz
+```
+teacher/        authoring — turns a chapter bundle into offline student HTML (needs Bun for mr-md)
+student/        the offline runtime bundled into that HTML (quiz capture, store, adaptation)
+shared/schema/  the bundle contract both sides depend on (types + validators)
+content/        chapter bundles (the hand-off artifact) — e.g. content/fractions
+docs/           design docs
 ```
 
-## Start here
+`teacher/` and `student/` never import from each other — only from `shared/`.
 
-Read the [short build plan](PLAN.md) for what we do now, next, and later.
+## The three stages
 
-Our first milestone is **one fractions lesson that adapts to answers, works offline, and saves progress across restarts**. A development quiz fixture is available; the next integration is the student player and device persistence, followed by adaptation.
+1. **Author (teacher, online + AI).** Produce a chapter bundle: `chapter.md` (the lesson,
+   in [mr-md](https://github.com/chirayuChhabra/mr-md) markdown), `quiz/*.json` (curated
+   questions, each tagged with a skill), and `skills.json` (a **skill graph** with
+   prerequisite edges + a pool of prerequisite questions).
+2. **Build → read (stage 1→2).** `mr-md` renders the bundle to standalone interactive HTML;
+   the build injects the student runtime. The student reads it and answers the quizzes.
+3. **Adapt (offline).** Each answer is graded and written to a **tamper-resistant local
+   store**. On a wrong answer the runtime steps back along the skill graph and serves a
+   **prerequisite** question instead of repeating the same one (e.g. miss *equivalent
+   fractions* → practise *multiplying both terms* first). No AI or network at this stage.
 
-The full demo will cover one complete chapter in Punjabi, Hindi, and English, with two students following different learning paths and a teacher receiving their synced progress.
+## Develop
 
-## Documentation
+Requires Node ≥ 22 (24+ recommended — TypeScript runs directly). Building the HTML also
+needs [Bun](https://bun.sh) for mr-md; nothing else does.
 
-| Document | Read it for |
-| --- | --- |
-| [Quiz engine](docs/quiz-engine.md) | Implemented question types, scoring, session API, and lesson-player integration |
-| [Product plan](docs/product-plan.md) | User journeys and first-version scope |
-| [Product rationale](docs/product-rationale.md) | The problem and reasons behind the approach |
-| [Content and authoring](docs/content-and-authoring.md) | Lessons, questions, simulations, and review |
-| [AI preparation](docs/ai-preparation.md) | Generation, validation, and teacher approval |
-| [Architecture](docs/architecture.md) | Components, local storage, and sync |
-| [Implementation checklist](docs/implementation-checklist.md) | Detailed engineering tasks and completion checks |
-| [Delivery plan](docs/delivery-plan.md) | Acceptance scenarios and open decisions |
+```sh
+npm install
+npm test            # schema, tamper-evident store, and adaptation logic
+npm run typecheck
+npm run validate    # validate content/fractions against the schema
+npm run build       # content/fractions -> dist/ (needs Bun for the mr-md render step)
+```
 
-Class 6 fractions and an installable web app are provisional choices. Confirm the curriculum and test offline behaviour on the intended devices before committing to them.
+## How the quiz layer works
 
-## Quiz engine credits
+Quizzes are authored with **mr-md's own quiz block** (single-answer multiple-choice). mr-md
+renders a static quiz; our injected runtime adds the parts it doesn't do — skill-tagged
+evidence capture, the encrypted append-only store, and prerequisite adaptation — by
+observing mr-md's quiz DOM. See [`docs/quiz-and-evidence.md`](docs/quiz-and-evidence.md).
 
-The quiz engine and playground were conceived, directed, and guided by **Chirayu Chhabra**. The code and documentation were implemented and written by **Codex**, OpenAI's AI coding assistant, under Chirayu Chhabra's guidance.
+**Tamper-resistance is record integrity, not exam security.** The store encrypts attempts
+and hash-chains them so edits are detected, but a local-only app has no server to hold the
+key and the answer key ships in the page. It deters casual tampering; it is not formal
+assessment security.
+
+## Credits & licensing
+
+Design docs originate from the SE-01 planning effort. The lesson renderer is
+[mr-md](https://github.com/chirayuChhabra/mr-md) by Chirayu Chhabra (PolyForm
+Noncommercial — fine for educational/non-profit use; revisit before any commercial use).

@@ -1,0 +1,20 @@
+{
+  "name": "se-01",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "validate": "node teacher/build/validate.ts",
+    "build": "node teacher/build/build.ts",
+    "bundle:runtime": "node teacher/build/bundle-runtime.ts",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.9.3"
+  }
+}

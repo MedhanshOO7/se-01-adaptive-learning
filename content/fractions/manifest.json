@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "equivalent-fractions",
+  "revision": "1",
+  "title": "Equivalent fractions",
+  "language": "en",
+  "lesson": "chapter.md",
+  "quizzes": ["quiz/1.json"],
+  "skills": "skills.json"
+}

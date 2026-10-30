@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "equivalent-fractions-check",
+  "title": "Check your understanding",
+  "questions": [
+    {
+      "q": "Which fraction is equivalent to 1/2?",
+      "options": ["2/4", "1/4", "2/3"],
+      "answer": 0,
+      "explanation": "Multiplying both parts of 1/2 by 2 gives 2/4. The quantity stays the same.",
+      "skill": "equivalence",
+      "difficulty": "core"
+    },
+    {
+      "q": "Which fraction is equivalent to 2/3?",
+      "options": ["4/6", "2/6", "3/4"],
+      "answer": 0,
+      "explanation": "Multiply top and bottom of 2/3 by 2 to get 4/6.",
+      "skill": "equivalence",
+      "difficulty": "core"
+    },
+    {
+      "q": "Write 4/8 in its simplest form.",
+      "options": ["1/2", "2/4", "4/8"],
+      "answer": 0,
+      "explanation": "Divide top and bottom of 4/8 by 4 to reach 1/2, which cannot be reduced further.",
+      "skill": "simplify",
+      "difficulty": "core"
+    }
+  ]
+}
