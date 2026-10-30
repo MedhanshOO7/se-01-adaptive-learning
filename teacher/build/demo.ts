@@ -13,6 +13,7 @@ import { loadBundle } from './load.ts';
 import { bundleRuntime } from './bundle-runtime.ts';
 import { buildConfig } from './build.ts';
 import { validateBundle, type QuizFile } from '../../shared/schema/index.ts';
+import { THEME_CSS } from './theme.ts';
 
 const esc = (s: string): string =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -95,38 +96,7 @@ function bkWireQuizzes(){document.addEventListener("click",function(e){
   var exp=document.getElementById(q.id+"-exp");if(exp)exp.hidden=false;
 });}bkWireQuizzes();`;
 
-const CSS = `
-:root{color-scheme:light dark;--bg:#fbfaf7;--fg:#1c1b18;--muted:#6b6a64;--line:#e4e1d8;--accent:#3a6b4f;--card:#fff;--ok:#2e7d46;--bad:#b23a48}
-@media(prefers-color-scheme:dark){:root{--bg:#15140f;--fg:#ecebe4;--muted:#a3a299;--line:#2d2b24;--card:#201e18;--accent:#7fc29b;--ok:#6fbf86;--bad:#e08391}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 ui-serif,Georgia,serif;padding:0 16px}
-main{max-width:720px;margin:0 auto;padding:40px 0 80px}h1{font-size:2rem;line-height:1.2}h2{margin-top:2em;font-size:1.3rem}
-code{font-family:ui-monospace,monospace;background:color-mix(in srgb,var(--line) 60%,transparent);padding:.05em .35em;border-radius:4px;font-size:.92em}
-.callout{border-left:3px solid var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);padding:.1em 16px;border-radius:0 8px 8px 0;margin:1.5em 0}
-.callout .tag{font:600 .7rem/1 ui-sans-serif,system-ui;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
-.bk-quiz{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:1.6em 0}
-.bk-quiz[data-se01-prereq]{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
-.bk-prompt{font-weight:600;margin:.2em 0 .9em}.se01-remediation-reason{color:var(--accent);font:600 .9rem/1.4 ui-sans-serif,system-ui;margin:.1em 0 .5em}
-.se01-remediation-prompt{font-weight:600;margin:.2em 0 .9em}
-.bk-opts{display:flex;flex-direction:column;gap:8px}
-.bk-opt{font:inherit;text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:9px;background:transparent;color:inherit;cursor:pointer}
-.bk-opt:hover:not(:disabled){border-color:var(--accent)}.bk-opt:disabled{cursor:default}
-.bk-opt.correct{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,transparent);font-weight:600}
-.bk-opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
-.bk-opt.disabled{opacity:.5}
-.bk-exp,.se01-explanation{margin-top:.9em;padding:.1em 14px;border-left:2px solid var(--line);color:var(--muted);font-size:.95rem}
-.panel{position:sticky;bottom:0;margin-top:40px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font:13px/1.5 ui-sans-serif,system-ui}
-.panel button{font:inherit;margin-right:8px;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;cursor:pointer}
-.panel .status{margin-left:6px}.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
-#record{margin-top:10px;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:12px;color:var(--muted)}
-.se01-tag{display:inline-block;font:600 .62rem/1 ui-sans-serif,system-ui;text-transform:uppercase;letter-spacing:.09em;color:var(--card);background:var(--accent);padding:4px 9px;border-radius:999px;margin-bottom:10px}
-.model{display:grid;gap:7px;margin:12px 0}
-.model .row{display:flex;align-items:center;gap:9px}
-.model .dot{width:9px;height:9px;border-radius:50%;flex:none}
-.dot.solid{background:var(--ok)}.dot.needs-work{background:var(--bad)}.dot.unseen{background:var(--line)}
-.model .lbl{flex:1}.model .st{color:var(--muted);font-size:12px}
-.hint{color:var(--muted);font-style:italic}
-ul{padding-left:1.2em}
-`;
+const CSS = THEME_CSS;
 
 export async function buildDemo(bundleDir: string, outFile: string): Promise<string> {
   const bundle = await loadBundle(bundleDir);

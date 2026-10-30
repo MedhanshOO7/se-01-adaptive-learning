@@ -7,6 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { join, extname, resolve, normalize } from 'node:path';
 import { buildDemo } from './demo.ts';
 import { buildTeacher } from './teacher.ts';
+import { THEME_CSS, graphHero } from './theme.ts';
 
 const DIST = resolve('dist');
 const PORT = Number(process.env.PORT ?? 4321);
@@ -25,17 +26,30 @@ const TYPES: Record<string, string> = {
 };
 
 function indexPage(): string {
-  const links =
-    CHAPTERS.map((c) => `<a href="/${c.file}">▶ ${c.title} <span style="opacity:.6;font-weight:400">· student</span></a>`).join('\n') +
-    `\n<a href="/teacher.html">▣ Teacher dashboard <span style="opacity:.6;font-weight:400">· progress on this device</span></a>`;
+  const tiles =
+    CHAPTERS.map((c, i) => `  <a class="tile" href="/${c.file}">
+    <span class="ic">${i + 1}</span>
+    <span><span class="t">${c.title}</span><br><span class="d">Learn &amp; practise — adapts when you miss a concept</span></span>
+    <span class="go">→</span>
+  </a>`).join('\n') +
+    `\n  <a class="tile teacher" href="/teacher.html">
+    <span class="ic">▦</span>
+    <span><span class="t">Teacher dashboard</span><br><span class="d">See each skill's progress on this device</span></span>
+    <span class="go">→</span>
+  </a>`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>SE-01 demos</title>
-<style>:root{color-scheme:light dark}body{font:17px/1.6 system-ui,sans-serif;max-width:640px;margin:56px auto;padding:0 20px}
-h1{font-size:1.6rem}p{opacity:.75}a{display:block;padding:14px 18px;margin:10px 0;border:1px solid #8884;border-radius:12px;
-text-decoration:none;color:inherit;font-weight:600}a:hover{border-color:#888}</style></head>
-<body><h1>SE-01 — offline adaptive learning</h1>
-<p>Pick a chapter. Everything runs locally; answer a question wrong to see it step back to a prerequisite.</p>
-${links}</body></html>`;
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>SE-01 — offline adaptive learning</title>
+<style>${THEME_CSS}</style></head>
+<body><main>
+<section class="hero">${graphHero()}
+  <p class="eyebrow">Offline adaptive learning</p>
+  <h1>Learning that steps back when you get stuck</h1>
+  <p>Miss a concept and it quietly moves to what comes before it — fully on your device, no internet needed.</p>
+</section>
+<nav class="menu">
+${tiles}
+</nav>
+</main></body></html>`;
 }
 
 async function main() {

@@ -10,23 +10,9 @@ import { loadBundle } from './load.ts';
 import { bundleRuntime } from './bundle-runtime.ts';
 import { buildConfig } from './build.ts';
 import { validateBundle } from '../../shared/schema/index.ts';
+import { THEME_CSS } from './theme.ts';
 
-const CSS = `
-:root{color-scheme:light dark;--bg:#fbfaf7;--fg:#1c1b18;--muted:#6b6a64;--line:#e4e1d8;--accent:#3a6b4f;--card:#fff;--ok:#2e7d46;--bad:#b23a48}
-@media(prefers-color-scheme:dark){:root{--bg:#15140f;--fg:#ecebe4;--muted:#a3a299;--line:#2d2b24;--card:#201e18;--accent:#7fc29b;--ok:#6fbf86;--bad:#e08391}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 ui-sans-serif,system-ui,sans-serif;padding:0 16px}
-main{max-width:760px;margin:0 auto;padding:40px 0 80px}h1{font-size:1.7rem}.sub{color:var(--muted);margin-top:-.4em}
-a.back{color:var(--accent);text-decoration:none;font-weight:600}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:18px 0}
-.card h2{margin:.1em 0 .2em;font-size:1.2rem}.meta{color:var(--muted);font-size:.9rem;margin-bottom:.8em}
-.badge{float:right;font-size:.8rem;font-weight:600}.badge.ok{color:var(--ok)}.badge.bad{color:var(--bad)}
-.row{display:flex;align-items:center;gap:10px;padding:5px 0;border-top:1px solid var(--line)}
-.dot{width:10px;height:10px;border-radius:50%;flex:none}.dot.solid{background:var(--ok)}.dot.needs-work{background:var(--bad)}.dot.unseen{background:var(--line)}
-.lbl{flex:1}.st{color:var(--muted);font-size:.85rem}
-.attention{margin-top:12px;padding:10px 14px;border-radius:9px;background:color-mix(in srgb,var(--bad) 12%,transparent);font-size:.92rem}
-.attention.good{background:color-mix(in srgb,var(--ok) 12%,transparent)}
-.missed{margin-top:8px;color:var(--muted);font-size:.85rem}
-`;
+const CSS = THEME_CSS;
 
 export async function buildTeacher(chapters: { title: string; bundle: string }[], outFile: string): Promise<string> {
   const runtimeJs = await bundleRuntime('SE01');
