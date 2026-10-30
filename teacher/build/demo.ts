@@ -13,7 +13,7 @@ import { loadBundle } from './load.ts';
 import { bundleRuntime } from './bundle-runtime.ts';
 import { buildConfig } from './build.ts';
 import { validateBundle, type QuizFile } from '../../shared/schema/index.ts';
-import { THEME_CSS } from './theme.ts';
+import { THEME_CSS, GRAPH_JS } from './theme.ts';
 
 const esc = (s: string): string =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -117,9 +117,10 @@ ${lessonHtml}
 <p class="hint">Answer below. Get one wrong on purpose to see the app step back to a prerequisite.</p>
 ${quizHtml}
 <div class="panel">
-  <strong>What the app has learned about you</strong>
+  <strong>Your skill map</strong>
   <span class="status" id="integrity"></span>
   <div class="model" id="model"></div>
+  <div class="map-legend"><span><span class="dot solid"></span> solid</span><span><span class="dot needs-work"></span> needs practice</span><span><span class="dot unseen"></span> not seen</span></div>
   <button id="show">Show raw record</button>
   <button id="tamper">Simulate tampering</button>
   <button id="reset">Reset</button>
@@ -128,6 +129,7 @@ ${quizHtml}
 </main>
 <script>${MRMD_SHIM}</script>
 <script>${runtimeJs}</script>
+<script>${GRAPH_JS}</script>
 <script>
 const CONFIG=${JSON.stringify(config)};
 let store;
@@ -140,10 +142,8 @@ async function renderModel(){
   if(!store)return;
   let events=[];try{events=await store.list();}catch(e){}
   const rows=SE01.summariseSkills(CONFIG.skillGraph,events);
-  document.getElementById('model').innerHTML=rows.map(function(r){
-    const word=r.status==='solid'?'solid':r.status==='needs-work'?'needs practice':'not seen yet';
-    return '<div class="row"><span class="dot '+r.status+'"></span><span class="lbl">'+r.label+'</span><span class="st">'+word+' · '+r.attempts+' tried</span></div>';
-  }).join('');
+  const statusById={};rows.forEach(function(r){statusById[r.id]=r.status;});
+  se01Graph(document.getElementById('model'),CONFIG.skillGraph,statusById);
   refresh();
 }
 // Refresh the learner model shortly after any answer (ours or a follow-up).

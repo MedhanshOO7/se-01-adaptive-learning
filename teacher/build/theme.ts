@@ -159,6 +159,22 @@ a.back:hover{text-decoration:underline}
 .attention.good{background:color-mix(in srgb,var(--ok) 12%,transparent)}
 .missed{margin-top:9px;color:var(--muted);font-size:.85rem}
 
+/* ---- the skill map: the real prerequisite graph, lit by mastery (the signature) ---- */
+.se01-map{width:100%;height:auto;display:block;margin:6px 0}
+.se01-map .edge{fill:none;stroke:var(--line);stroke-width:2;transition:stroke .4s}
+.se01-map .edge.lit{stroke:color-mix(in srgb,var(--ok) 60%,var(--line))}
+.se01-map .node circle{stroke-width:2.5;transition:fill .45s,stroke .45s;transform-box:fill-box;transform-origin:center}
+.se01-map .node.n-solid circle{fill:color-mix(in srgb,var(--ok) 22%,var(--surface));stroke:var(--ok)}
+.se01-map .node.n-needs-work circle{fill:color-mix(in srgb,var(--bad) 20%,var(--surface));stroke:var(--bad)}
+.se01-map .node.n-needs-work circle{animation:mapPulse 1.7s ease-in-out infinite}
+.se01-map .node.n-unseen circle{fill:var(--surface-2);stroke:var(--line);stroke-dasharray:3 3}
+.se01-map text{font-family:var(--sans);font-size:10.5px;font-weight:600;fill:var(--ink)}
+.se01-map .node{animation:nodeIn .5s both cubic-bezier(.2,.8,.2,1)}
+.map-legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.8rem;margin-top:2px}
+.map-legend .dot{width:9px;height:9px}
+@keyframes nodeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes mapPulse{0%,100%{stroke-width:2.5}50%{stroke-width:4}}
+
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
@@ -183,3 +199,30 @@ export function graphHero(): string {
     <g class="hero-float b"><circle class="pulse pulse-path" r="3.5"/></g>
   </svg>`;
 }
+
+/** Client-side renderer for the real skill map. Injected as a <script> into the student and
+ *  teacher pages; call window.se01Graph(mountEl, skillGraph, {skillId: status}). Lays skills
+ *  out foundations→advanced by prerequisite depth and colours each node by mastery. */
+export const GRAPH_JS = `
+window.se01Graph=function(mount,graph,status){
+  const S=graph.skills,by={};S.forEach(s=>by[s.id]=s);
+  const depth={},calc=(id,seen)=>{if(id in depth)return depth[id];if(seen.has(id))return 0;seen.add(id);
+    const ps=(by[id].prerequisiteIds||[]).filter(p=>by[p]);depth[id]=ps.length?1+Math.max.apply(0,ps.map(p=>calc(p,seen))):0;return depth[id];};
+  S.forEach(s=>calc(s.id,new Set()));
+  const maxD=Math.max(0,...S.map(s=>depth[s.id])),cols={};
+  S.forEach(s=>{(cols[depth[s.id]]=cols[depth[s.id]]||[]).push(s.id);});
+  const colN=maxD+1,W=620,colW=W/colN,maxRows=Math.max(...Object.values(cols).map(a=>a.length)),H=Math.max(150,maxRows*96),pos={};
+  for(let c=0;c<colN;c++){(cols[c]||[]).forEach((id,i,a)=>{pos[id]={x:c*colW+colW/2,y:(i+1)/(a.length+1)*H};});}
+  const NS="http://www.w3.org/2000/svg",el=(t,a)=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);return n;};
+  const svg=el("svg",{class:"se01-map",viewBox:"0 0 "+W+" "+H,role:"img","aria-label":"skill map"});
+  S.forEach(s=>(s.prerequisiteIds||[]).forEach(p=>{if(!pos[p])return;const a=pos[p],b=pos[s.id],mx=(a.x+b.x)/2;
+    svg.appendChild(el("path",{class:"edge"+(status[p]==="solid"?" lit":""),d:"M"+a.x+" "+a.y+" C "+mx+" "+a.y+" "+mx+" "+b.y+" "+b.x+" "+b.y}));}));
+  S.forEach((s,i)=>{const p=pos[s.id],st=status[s.id]||"unseen",g=el("g",{class:"node n-"+st});g.style.animationDelay=(i*0.06)+"s";
+    g.appendChild(el("circle",{cx:p.x,cy:p.y,r:17}));
+    const words=(by[s.id].label||s.id).split(" ").slice(0,4),t=el("text",{x:p.x,y:p.y+32,"text-anchor":"middle"});
+    const l1=words.slice(0,2).join(" "),l2=words.slice(2).join(" ");
+    const s1=el("tspan",{x:p.x});s1.textContent=l1;t.appendChild(s1);
+    if(l2){const s2=el("tspan",{x:p.x,dy:"1.15em"});s2.textContent=l2;t.appendChild(s2);}
+    g.appendChild(t);svg.appendChild(g);});
+  mount.innerHTML="";mount.appendChild(svg);
+};`;

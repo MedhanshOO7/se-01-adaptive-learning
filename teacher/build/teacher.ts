@@ -10,7 +10,7 @@ import { loadBundle } from './load.ts';
 import { bundleRuntime } from './bundle-runtime.ts';
 import { buildConfig } from './build.ts';
 import { validateBundle } from '../../shared/schema/index.ts';
-import { THEME_CSS } from './theme.ts';
+import { THEME_CSS, GRAPH_JS } from './theme.ts';
 
 const CSS = THEME_CSS;
 
@@ -70,10 +70,12 @@ export async function buildTeacher(chapters: { title: string; bundle: string }[]
 <div id="root"></div>
 </main>
 <script>${runtimeJs}</script>
+<script>${GRAPH_JS}</script>
 <script>
 const CHAPTERS=${JSON.stringify(configs)};
 const root=document.getElementById('root');
 function h(html){const d=document.createElement('div');d.innerHTML=html;return d.firstElementChild;}
+const LEGEND='<div class="map-legend"><span><span class="dot solid"></span> solid</span><span><span class="dot needs-work"></span> needs practice</span><span><span class="dot unseen"></span> not seen</span></div>';
 (async function(){
   for(const ch of CHAPTERS){
     const store=await SE01.openEventStore({backend:SE01.indexedDbBackend('se01:'+ch.chapterId),secret:ch.secret,chapterId:ch.chapterId,chapterRevision:ch.chapterRevision});
@@ -84,10 +86,7 @@ function h(html){const d=document.createElement('div');d.innerHTML=html;return d
     const needs=rows.filter(r=>r.status==='needs-work');
     const attempts=events.length;
     const badge=tampered?'<span class="badge bad">✗ record tampered</span>':attempts?'<span class="badge ok">✓ record intact</span>':'';
-    const skillRows=rows.map(function(r){
-      const word=r.status==='solid'?'solid':r.status==='needs-work'?'needs practice':'not seen yet';
-      return '<div class="row"><span class="dot '+r.status+'"></span><span class="lbl">'+r.label+'</span><span class="st">'+word+' · '+r.attempts+' tried</span></div>';
-    }).join('');
+    const statusById={};rows.forEach(function(r){statusById[r.id]=r.status;});
     let attention;
     if(attempts===0) attention='<div class="attention">No activity yet — have the student open this chapter and answer some questions.</div>';
     else if(needs.length) attention='<div class="attention"><strong>Needs attention:</strong> '+needs.map(function(n){return n.label;}).join('; ')+'.</div>';
@@ -104,7 +103,10 @@ function h(html){const d=document.createElement('div');d.innerHTML=html;return d
       });
       missed='<div class="missed">Missed: '+Object.keys(byQ).map(function(p){return '“'+p+'”';}).join(' · ')+'</div>';
     }
-    root.appendChild(h('<div class="card">'+badge+'<h2>'+ch.title+'</h2><div class="meta">'+solid+' / '+rows.length+' skills solid · '+attempts+' attempt(s)</div>'+skillRows+attention+missed+'</div>'));
+    const mapId='map-'+ch.chapterId;
+    const card=h('<div class="card">'+badge+'<h2>'+ch.title+'</h2><div class="meta">'+solid+' / '+rows.length+' skills solid · '+attempts+' attempt(s)</div><div class="se01-map-mount" id="'+mapId+'"></div>'+LEGEND+attention+missed+'</div>');
+    root.appendChild(card);
+    se01Graph(document.getElementById(mapId),ch.skillGraph,statusById);
   }
   if(!CHAPTERS.length) root.innerHTML='<p>No chapters.</p>';
 })();
