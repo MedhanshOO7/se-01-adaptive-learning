@@ -37,17 +37,19 @@ validator in `shared/schema/validate.ts` enforces them.
 
 ## Two ways to run this
 
-- **Automated (one command):** uses the free **OpenCode Zen** gateway.
+- **Automated (one command):** uses a free OpenAI-compatible gateway (OpenRouter by default,
+  OpenCode Zen if that key is set instead). Put the key in `.env` (gitignored):
   ```sh
-  export OPENCODE_API_KEY=...            # free key from opencode.ai
-  npm run models                         # see available models; free ones are flagged 🆓
-  export OPENCODE_MODEL=<pick one>       # optional; defaults to a free model
+  echo 'OPENROUTER_API_KEY=sk-or-...' >> .env   # or OPENCODE_API_KEY=...
+  npm run models                                 # ranked catalog; free ones flagged 🆓
   npm run author -- <chapter.pdf|.md|.txt> [slug]
   ```
-  This extracts the source to text (PDFs via unpdf — free models are text-only), asks the
-  model for the bundle, writes it to `content/<slug>/`, validates, and builds the student HTML.
-  Review the result (steps 3 + 9 below) — free models are weaker, so validation may fail and
-  you may need to re-run or pick a stronger model.
+  With no model set it auto-picks the best free model (free + structured output + reasoning +
+  biggest context). Override with `OPENROUTER_MODEL=<id>`. It extracts the source to text
+  (PDFs via unpdf — free models are text-only), asks the model for the bundle, writes it to
+  `content/<slug>/`, validates, and builds the student HTML. Review the result (steps 3 + 9
+  below) — free models are weaker, so validation may fail and you may need to re-run or pick a
+  stronger model.
 - **Manual / assisted:** follow the steps below yourself, writing each file. Optional starter:
   `node teacher/author-chapter/scaffold.ts <slug> "<Title>" <lang>` creates the directory with
   placeholder files to fill in.

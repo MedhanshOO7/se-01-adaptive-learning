@@ -12,11 +12,11 @@ import { validateBundle, type Manifest, type QuizFile, type SkillGraph } from '.
 import { loadBundle } from '../build/load.ts';
 import { buildChapter } from '../build/build.ts';
 import { extractSource } from './extract.ts';
-import { chat } from './opencode.ts';
+import { chat, listModels, bestFree, provider } from './provider.ts';
 
-// beam-free: free, structured-output + reasoning, 1M context / 131k output — the strongest
-// free model for turning a lesson into a structured bundle (run `npm run models` for the list).
-const MODEL = process.env.OPENCODE_MODEL ?? 'beam-free';
+// Explicit override, else auto-pick the best free model from the live catalog (resolved in main).
+const MODEL_OVERRIDE =
+  process.env.LLM_MODEL ?? process.env.OPENROUTER_MODEL ?? process.env.OPENCODE_MODEL;
 
 interface Generated {
   title: string;
@@ -61,10 +61,10 @@ Rules:
   prose with headings and a worked example, optionally a callout (> [!tip]), and it MUST end
   with: ![Check your understanding](quiz/1.json)`;
 
-async function generate(sourceText: string, slugOverride?: string): Promise<Generated> {
+async function generate(sourceText: string, model: string, slugOverride?: string): Promise<Generated> {
   const raw = await chat({
-    model: MODEL,
-    maxTokens: Number(process.env.OPENCODE_MAX_TOKENS ?? 8000),
+    model,
+    maxTokens: Number(process.env.LLM_MAX_TOKENS ?? 8000),
     messages: [
       { role: 'system', content: SYSTEM },
       {
@@ -109,15 +109,23 @@ function writeBundle(outDir: string, g: Generated): void {
 async function main() {
   const source = process.argv[2];
   if (!source) {
-    console.error('Usage: OPENCODE_API_KEY=... node teacher/author-chapter/generate.ts <source.pdf|.md|.txt> [slug]');
+    console.error('Usage: npm run author -- <source.pdf|.md|.txt> [slug]   (reads OPENROUTER_API_KEY from .env)');
     process.exit(1);
   }
 
   console.log(`• Extracting ${basename(source)}…`);
   const text = await extractSource(source);
 
-  console.log(`• Generating the chapter with ${MODEL} (OpenCode Zen)…`);
-  const g = await generate(text, process.argv[3]);
+  let model = MODEL_OVERRIDE;
+  if (!model) {
+    const best = bestFree(await listModels());
+    if (!best) throw new Error('No models available from the gateway.');
+    model = best.id;
+    console.log(`• Auto-selected best free model: ${model}`);
+  }
+
+  console.log(`• Generating the chapter with ${model} (${provider().name})…`);
+  const g = await generate(text, model, process.argv[3]);
 
   const outDir = resolve('content', g.slug);
   writeBundle(outDir, g);

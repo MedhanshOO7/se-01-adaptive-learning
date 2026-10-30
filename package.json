@@ -7,8 +7,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "models": "node teacher/author-chapter/list-models.ts",
-    "author": "node teacher/author-chapter/generate.ts",
+    "models": "node --env-file-if-exists=.env teacher/author-chapter/list-models.ts",
+    "author": "node --env-file-if-exists=.env teacher/author-chapter/generate.ts",
     "validate": "node teacher/build/validate.ts",
     "build": "node teacher/build/build.ts",
     "bundle:runtime": "node teacher/build/bundle-runtime.ts",
