@@ -11,21 +11,21 @@ import { FONT_CSS } from './fonts.ts';
 export const THEME_CSS = FONT_CSS + `
 :root{
   color-scheme:light;
-  /* Base hue blended from two random colors (#913383 + #5de94d → #778e68). */
-  --paper:#fbfcfa; --surface:#ffffff; --surface-2:#f8fbf6;
-  --ink:#1f2a18; --muted:#728367; --line:#e4ecdf;
-  --brand:#5fae2e; --brand-2:#3fca57; --brand-ink:#ffffff;
+  /* Base blended from two random colors (#e86487 + #636470 → #a6647c), mid lightness. */
+  --paper:#fcfafb; --surface:#ffffff; --surface-2:#fbf6f8;
+  --ink:#2e1a21; --muted:#80606c; --line:#eadce1;
+  --brand:#c9366b; --brand-2:#ba5a36; --brand-ink:#ffffff;
   --ok:#0e8f8a; --bad:#d6436b;
-  --shadow:0 1px 2px rgba(31,42,24,.05), 0 12px 32px -16px rgba(63,202,87,.20);
+  --shadow:0 1px 2px rgba(46,26,33,.05), 0 12px 32px -16px rgba(201,54,107,.20);
   --sans:"UbuntuSE","Ubuntu","Cantarell","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
 }
 /* Dark palette is opt-in only (data-theme="dark"); the app forces light by default. */
 :root[data-theme="dark"]{
-  --paper:#41473d; --surface:#4a5145; --surface-2:#525b4d;
-  --ink:#f3f5f0; --muted:#c3ccbd; --line:#687560;
-  --brand:#a8e77e; --brand-2:#79d78a; --brand-ink:#12190d;
+  --paper:#533c44; --surface:#604851; --surface-2:#6d545d;
+  --ink:#f4f1f2; --muted:#cdc1c5; --line:#81656f;
+  --brand:#e07199; --brand-2:#d1876c; --brand-ink:#2e1a21;
   --ok:#49cfc6; --bad:#ff7aa0;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(168,231,126,.28);
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(224,113,153,.28);
 }
 
 *{box-sizing:border-box}

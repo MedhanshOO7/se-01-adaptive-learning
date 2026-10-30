@@ -18,23 +18,23 @@ const CSS = THEME_CSS;
 // base #c399e4, a violet→magenta) plus a Spline-style animated gradient-blob hero.
 const TEACHER_CSS = `
 :root{
-  --paper:#fbfafc; --surface:#ffffff; --surface-2:#f9f6fb;
-  --ink:#22172b; --muted:#776586; --line:#e6dfec;
-  --brand:#8d39d0; --brand-2:#cb34a9; --brand-ink:#ffffff;
+  --paper:#fcfcfa; --surface:#ffffff; --surface-2:#fafbf6;
+  --ink:#282e1a; --muted:#778060; --line:#e6eadc;
+  --brand:#a1c936; --brand-2:#42ba36; --brand-ink:#282e1a;
   --ok:#0e8f8a; --bad:#d6436b;
-  --shadow:0 1px 2px rgba(34,23,43,.05), 0 14px 34px -16px rgba(141,57,208,.24);
+  --shadow:0 1px 2px rgba(40,46,26,.05), 0 14px 34px -16px rgba(161,201,54,.24);
 }
 /* Teacher dark palette opt-in only; light forced by default. */
 :root[data-theme="dark"]{
-  --paper:#433d47; --surface:#4c4551; --surface-2:#554d5b;
-  --ink:#f3f0f5; --muted:#c6bdce; --line:#6b6173;
-  --brand:#b97de8; --brand-2:#d978c3; --brand-ink:#140d19;
+  --paper:#4d533c; --surface:#5a6048; --surface-2:#676d54;
+  --ink:#f3f4f1; --muted:#c9cdc1; --line:#798165;
+  --brand:#c2e071; --brand-2:#75d16c; --brand-ink:#282e1a;
   --ok:#49cfc6; --bad:#ff7aa0;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(185,125,232,.3);
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -20px rgba(194,224,113,.3);
 }
 /* Spline-style fluid hero: drifting, blurred gradient blobs over a dark base. */
 .t-hero{position:relative;overflow:hidden;border-radius:24px;padding:38px 30px;margin:6px 0 24px;
-  background:#160d1e;box-shadow:var(--shadow);isolation:isolate}
+  background:#15190c;box-shadow:var(--shadow);isolation:isolate}
 .t-hero h1,.t-hero p{position:relative;z-index:1;color:#fff}
 .t-hero h1{margin:.05em 0 .2em}.t-hero p{color:rgba(255,255,255,.82);margin:0;max-width:48ch}
 .t-hero .eyebrow{font-weight:650;font-size:.8rem;color:rgba(255,255,255,.7);margin:0 0 .3em}
