@@ -4,7 +4,7 @@
     { "id": "subatomic-particles", "label": "Electrons, protons and neutrons and their charges", "prerequisiteIds": [] },
     { "id": "atomic-models", "label": "Thomson, Rutherford and Bohr models of the atom", "prerequisiteIds": ["subatomic-particles"] },
     { "id": "atomic-number-mass-number", "label": "Atomic number and mass number", "prerequisiteIds": ["subatomic-particles"] },
-    { "id": "electron-distribution", "label": "Distribution of electrons in shells (2n², Bohr–Bury)", "prerequisiteIds": ["atomic-models"] },
+    { "id": "electron-distribution", "label": "Distribution of electrons in shells (2n², Bohr–Bury)", "prerequisiteIds": ["atomic-models", "atomic-number-mass-number"] },
     { "id": "valency", "label": "Valence electrons and valency", "prerequisiteIds": ["electron-distribution"] },
     { "id": "isotopes-isobars", "label": "Isotopes and isobars", "prerequisiteIds": ["atomic-number-mass-number"] }
   ],
@@ -12,16 +12,16 @@
     "subatomic-particles": [
       {
         "q": "Which sub-atomic particle carries a negative charge?",
-        "options": ["Electron", "Proton", "Neutron", "Nucleus"],
-        "answer": 0,
+        "options": ["Proton", "Electron", "Neutron", "Nucleus"],
+        "answer": 1,
         "explanation": "Electrons carry a negative charge; protons are positive and neutrons are neutral.",
         "skill": "subatomic-particles",
         "difficulty": "intro"
       },
       {
         "q": "Where are protons and neutrons located in an atom?",
-        "options": ["In the nucleus", "In the outermost shell", "Spread evenly through the atom", "Outside the atom"],
-        "answer": 0,
+        "options": ["In the outermost shell", "In the nucleus", "Spread evenly through the atom", "Outside the atom"],
+        "answer": 1,
         "explanation": "Protons and neutrons sit in the nucleus; electrons move around it.",
         "skill": "subatomic-particles",
         "difficulty": "intro"
@@ -30,16 +30,16 @@
     "atomic-models": [
       {
         "q": "In Rutherford's model, almost the entire mass of the atom is concentrated in the…",
-        "options": ["Nucleus", "Electron shells", "Empty space", "Outermost shell"],
-        "answer": 0,
+        "options": ["Electron shells", "Nucleus", "Empty space", "Outermost shell"],
+        "answer": 1,
         "explanation": "Rutherford's gold-foil experiment showed a small, dense, positive nucleus holding nearly all the mass.",
         "skill": "atomic-models",
         "difficulty": "intro"
       },
       {
         "q": "What did Bohr add to fix the instability problem of Rutherford's atom?",
-        "options": ["Electrons revolve only in fixed energy shells without losing energy", "Electrons sit still inside the nucleus", "The nucleus is negative", "Atoms have no electrons"],
-        "answer": 0,
+        "options": ["Electrons sit still inside the nucleus", "The nucleus is negative", "Electrons revolve only in fixed energy shells without losing energy", "Atoms have no electrons"],
+        "answer": 2,
         "explanation": "Bohr proposed discrete stable shells (K, L, M…) in which electrons do not radiate energy.",
         "skill": "atomic-models",
         "difficulty": "intro"
@@ -48,16 +48,16 @@
     "atomic-number-mass-number": [
       {
         "q": "The atomic number of an element is the number of…",
-        "options": ["Protons in the nucleus", "Neutrons in the nucleus", "Electrons in the outermost shell", "Shells in the atom"],
-        "answer": 0,
+        "options": ["Neutrons in the nucleus", "Protons in the nucleus", "Electrons in the outermost shell", "Shells in the atom"],
+        "answer": 1,
         "explanation": "Atomic number Z = number of protons, and it identifies the element.",
         "skill": "atomic-number-mass-number",
         "difficulty": "intro"
       },
       {
         "q": "Mass number of an atom equals the number of…",
-        "options": ["Protons + neutrons", "Protons + electrons", "Neutrons only", "Electrons + neutrons"],
-        "answer": 0,
+        "options": ["Protons + electrons", "Neutrons only", "Protons + neutrons", "Electrons + neutrons"],
+        "answer": 2,
         "explanation": "Mass number A = protons + neutrons (the particles in the nucleus).",
         "skill": "atomic-number-mass-number",
         "difficulty": "intro"
@@ -66,8 +66,8 @@
     "electron-distribution": [
       {
         "q": "What is the maximum number of electrons the L shell (n = 2) can hold?",
-        "options": ["8", "2", "18", "32"],
-        "answer": 0,
+        "options": ["2", "8", "18", "32"],
+        "answer": 1,
         "explanation": "Maximum per shell is 2n²; for n = 2 that is 2 × 2² = 8.",
         "skill": "electron-distribution",
         "difficulty": "intro"

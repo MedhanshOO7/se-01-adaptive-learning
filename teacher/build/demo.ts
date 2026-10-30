@@ -7,8 +7,8 @@
 //
 //   node teacher/build/demo.ts [bundleDir] [outFile]   (defaults: content/fractions, dist/demo.html)
 
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import { dirname, resolve, join } from 'node:path';
 import { loadBundle } from './load.ts';
 import { bundleRuntime } from './bundle-runtime.ts';
 import { buildConfig } from './build.ts';
@@ -17,6 +17,49 @@ import { validateBundle, type QuizFile } from '../../shared/schema/index.ts';
 const esc = (s: string): string =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 const b64 = (s: string): string => Buffer.from(s, 'utf8').toString('base64');
+
+// A tiny mr-md-ish markdown renderer for the DEMO only (the real build uses mr-md). Handles
+// frontmatter, headings, bullet lists, `> [!tip]` callouts, bold/`code`, and paragraphs; the
+// quiz reference line is dropped (quizzes are rendered separately into `.bk-quiz` markup).
+function renderLesson(md: string): string {
+  md = md.replace(/^---\n[\s\S]*?\n---\n/, ''); // strip YAML frontmatter
+  const inline = (t: string) =>
+    esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`(.+?)`/g, '<code>$1</code>');
+  const out: string[] = [];
+  const lines = md.split('\n');
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (/^!\[[^\]]*\]\([^)]*\.json\)\s*$/.test(line) || line.trim() === '') { i++; continue; }
+    const h = line.match(/^(#{1,3})\s+(.*)$/);
+    if (h) { out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`); i++; continue; }
+    if (line.startsWith('>')) {
+      const body: string[] = [];
+      let kind = '';
+      while (i < lines.length && lines[i].startsWith('>')) {
+        const t = lines[i].replace(/^>\s?/, '');
+        const tag = t.match(/^\[!(\w+)\]\s*$/);
+        if (tag) kind = tag[1].toLowerCase();
+        else if (t.trim()) body.push(inline(t));
+        i++;
+      }
+      out.push(`<div class="callout"><div class="tag">${esc(kind || 'note')}</div><p>${body.join(' ')}</p></div>`);
+      continue;
+    }
+    if (/^[-*]\s+/.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^[-*]\s+/.test(lines[i])) { items.push(`<li>${inline(lines[i].replace(/^[-*]\s+/, ''))}</li>`); i++; }
+      out.push(`<ul>${items.join('')}</ul>`);
+      continue;
+    }
+    const para: string[] = [];
+    while (i < lines.length && lines[i].trim() !== '' && !/^(#{1,3}\s|[-*]\s|>)/.test(lines[i]) && !/^!\[[^\]]*\]\([^)]*\.json\)/.test(lines[i])) {
+      para.push(lines[i]); i++;
+    }
+    if (para.length) out.push(`<p>${inline(para.join(' '))}</p>`);
+  }
+  return out.join('\n');
+}
 
 /** Render one quiz in the same `.bk-*` markup mr-md emits, so our runtime maps to it 1:1. */
 function renderQuiz(quiz: QuizFile, blockIdx: number): string {
@@ -81,21 +124,8 @@ code{font-family:ui-monospace,monospace;background:color-mix(in srgb,var(--line)
 .model .dot{width:9px;height:9px;border-radius:50%;flex:none}
 .dot.solid{background:var(--ok)}.dot.needs-work{background:var(--bad)}.dot.unseen{background:var(--line)}
 .model .lbl{flex:1}.model .st{color:var(--muted);font-size:12px}
-`;
-
-const LESSON = `
-<h1>Equivalent fractions</h1>
-<p>Two fractions are <b>equivalent</b> when they describe the same amount, even though they are
-written with different numbers. For example, <code>1/2</code> and <code>2/4</code> look different
-but cover exactly the same part of a whole.</p>
-<h2>Why they are equal</h2>
-<p>A fraction splits a whole into <b>equal parts</b>. If you multiply the numerator and the
-denominator by the same number, you are just cutting each part into smaller equal pieces — the
-amount does not change.</p>
-<div class="callout"><div class="tag">Tip</div><p>Multiplying <code>1/2</code> by <code>2/2</code>
-gives <code>2/4</code>. You multiplied by 1 in disguise, so the value stays the same.</p></div>
-<h2>Your turn</h2>
-<p>Answer below. Get one wrong on purpose to see the app step back to a prerequisite.</p>
+.hint{color:var(--muted);font-style:italic}
+ul{padding-left:1.2em}
 `;
 
 async function main() {
@@ -108,6 +138,7 @@ async function main() {
 
   const runtimeJs = await bundleRuntime('SE01'); // expose SE01.bootstrap for the demo panel
   const config = buildConfig(bundle, 'demo-secret');
+  const lessonHtml = renderLesson(readFileSync(join(bundleDir, bundle.manifest.lesson), 'utf8'));
   const quizHtml = bundle.quizzes.map((q, i) => renderQuiz(q, i)).join('\n');
 
   const html = `<!doctype html>
@@ -115,7 +146,8 @@ async function main() {
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(bundle.manifest.title)} — demo</title><style>${CSS}</style></head>
 <body><main>
-${LESSON}
+${lessonHtml}
+<p class="hint">Answer below. Get one wrong on purpose to see the app step back to a prerequisite.</p>
 ${quizHtml}
 <div class="panel">
   <strong>What the app has learned about you</strong>
