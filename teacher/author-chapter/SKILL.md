@@ -37,10 +37,17 @@ validator in `shared/schema/validate.ts` enforces them.
 
 ## Two ways to run this
 
-- **Automated (one command):** `ANTHROPIC_API_KEY=... npm run author -- <chapter.pdf> [slug]`
-  sends the PDF to Claude, writes the whole bundle to `content/<slug>/`, validates it, and
-  builds the student HTML. Use this when a teacher just wants to hand in a PDF. Review the
-  result (steps 3 + 9 below) before trusting it.
+- **Automated (one command):** uses the free **OpenCode Zen** gateway.
+  ```sh
+  export OPENCODE_API_KEY=...            # free key from opencode.ai
+  npm run models                         # see available models; free ones are flagged 🆓
+  export OPENCODE_MODEL=<pick one>       # optional; defaults to a free model
+  npm run author -- <chapter.pdf|.md|.txt> [slug]
+  ```
+  This extracts the source to text (PDFs via unpdf — free models are text-only), asks the
+  model for the bundle, writes it to `content/<slug>/`, validates, and builds the student HTML.
+  Review the result (steps 3 + 9 below) — free models are weaker, so validation may fail and
+  you may need to re-run or pick a stronger model.
 - **Manual / assisted:** follow the steps below yourself, writing each file. Optional starter:
   `node teacher/author-chapter/scaffold.ts <slug> "<Title>" <lang>` creates the directory with
   placeholder files to fill in.

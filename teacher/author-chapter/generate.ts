@@ -1,20 +1,22 @@
-// Automated stage-1 authoring: a chapter PDF in, a validated chapter bundle out, then built
-// to the offline student HTML. One command does the whole teacher → student hand-off.
+// Automated stage-1 authoring: a chapter source (PDF or .md/.txt) in, a validated chapter
+// bundle out, then built to the offline student HTML. One command, teacher → student.
 //
-//   ANTHROPIC_API_KEY=sk-... node teacher/author-chapter/generate.ts <chapter.pdf> [slug]
+//   OPENCODE_API_KEY=... [OPENCODE_MODEL=...] node teacher/author-chapter/generate.ts <source> [slug]
 //
-// The LLM (Claude) reads the PDF and returns the lesson markdown, a skill graph with
-// prerequisite questions, and skill-tagged quizzes. We write them, validate against the
-// shared schema, and then run the build (which needs Bun for mr-md).
+// Uses the free OpenCode Zen gateway. Run `npm run models` to see available models and set
+// OPENCODE_MODEL. Free models are text-only, so PDFs are extracted to text first (extract.ts).
 
-import Anthropic from '@anthropic-ai/sdk';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 import { validateBundle, type Manifest, type QuizFile, type SkillGraph } from '../../shared/schema/index.ts';
 import { loadBundle } from '../build/load.ts';
 import { buildChapter } from '../build/build.ts';
+import { extractSource } from './extract.ts';
+import { chat } from './opencode.ts';
 
-const MODEL = 'claude-opus-5-5';
+// beam-free: free, structured-output + reasoning, 1M context / 131k output — the strongest
+// free model for turning a lesson into a structured bundle (run `npm run models` for the list).
+const MODEL = process.env.OPENCODE_MODEL ?? 'beam-free';
 
 interface Generated {
   title: string;
@@ -25,75 +27,65 @@ interface Generated {
   quizzes: { path: string; file: QuizFile }[];
 }
 
-const SYSTEM = `You convert a source lesson (a PDF) into an SE-01 "chapter bundle" for an
-offline adaptive-learning app. You output ONLY a single JSON object, no prose, no code fence.
+const SYSTEM = `You convert a source lesson (plain text) into an SE-01 "chapter bundle" for an
+offline adaptive-learning app. Output ONLY a single JSON object — no prose, no markdown fence.
 
-The JSON has this exact shape:
+Shape:
 {
   "title": string,
-  "slug": string,                     // kebab-case, derived from the title
+  "slug": string,                     // kebab-case, from the title
   "language": "en",
   "chapterMarkdown": string,          // the lesson, in mr-md markdown (see rules)
   "skills": {
     "schemaVersion": 1,
     "skills": [ { "id": kebab-id, "label": string, "prerequisiteIds": [ids...] } ],
-    "prereqPool": { "<skill-id>": [ Question, ... ] }   // remediation questions
+    "prereqPool": { "<skill-id>": [ Question, ... ] }
   },
   "quizzes": [ { "path": "quiz/1.json", "file": {
     "schemaVersion": 1, "id": kebab-id, "title": string, "questions": [ Question, ... ] } } ]
 }
 
 A Question is: { "q": string, "options": [>=2 strings], "answer": 0-based-index-into-options,
-"explanation": string, "skill": "<an id present in skills.skills>", "difficulty": "intro"|"core"|"stretch" }.
+"explanation": string, "skill": "<an id in skills.skills>", "difficulty": "intro"|"core"|"stretch" }.
 
 Rules:
-- Draw ONLY on the PDF's content. Do not invent facts. If the PDF is unclear, keep it simple.
-- Design a small skill graph (3-6 skills). "prerequisiteIds" are the skills a student must
-  understand first — these drive the app stepping back when a student struggles, so set them
-  thoughtfully. No cycles; a skill is never its own prerequisite.
+- Draw ONLY on the source text. Do not invent facts.
+- Design a small skill graph (3-6 skills). "prerequisiteIds" are what a student must learn
+  first — these drive the app stepping back when a student struggles. No cycles; a skill is
+  never its own prerequisite.
 - For EVERY skill that has prerequisites, put 1-3 "intro" questions for each prerequisite skill
-  into prereqPool, keyed by that prerequisite's id. This is the remediation material.
+  into prereqPool, keyed by that prerequisite's id.
 - Inline quiz questions are usually "core"; prereqPool questions are "intro".
-- Every question's "skill" must be an id you declared in skills.skills.
+- Every question's "skill" must be an id declared in skills.skills.
 - chapterMarkdown is mr-md markdown: YAML frontmatter (title, slug, description, status: unread),
-  then prose with headings, a worked example, an optional callout (> [!tip]), and it MUST end
-  with a quiz reference line: ![Check your understanding](quiz/1.json)`;
+  prose with headings and a worked example, optionally a callout (> [!tip]), and it MUST end
+  with: ![Check your understanding](quiz/1.json)`;
 
-async function generate(pdfPath: string, slugOverride?: string): Promise<Generated> {
-  const client = new Anthropic(); // resolves ANTHROPIC_API_KEY / auth profile
-  const pdfB64 = readFileSync(pdfPath).toString('base64');
-
-  const response = await client.messages.create({
+async function generate(sourceText: string, slugOverride?: string): Promise<Generated> {
+  const raw = await chat({
     model: MODEL,
-    max_tokens: 16000,
-    system: SYSTEM,
+    maxTokens: Number(process.env.OPENCODE_MAX_TOKENS ?? 8000),
     messages: [
+      { role: 'system', content: SYSTEM },
       {
         role: 'user',
-        content: [
-          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfB64 } },
-          {
-            type: 'text',
-            text:
-              'Turn this chapter into the JSON bundle described in the system prompt.' +
-              (slugOverride ? ` Use the slug "${slugOverride}".` : '') +
-              ' Output only the JSON object.',
-          },
-        ],
+        content:
+          'Source lesson:\n\n' +
+          sourceText.slice(0, 40000) + // keep within free-model context limits
+          '\n\nReturn ONLY the JSON bundle.' +
+          (slugOverride ? ` Use the slug "${slugOverride}".` : ''),
       },
     ],
   });
-
-  const text = response.content.filter((b) => b.type === 'text').map((b) => (b as { text: string }).text).join('');
-  const json = text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1); // tolerate stray wrapping
+  const json = raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1); // tolerate stray wrapping
   try {
     return JSON.parse(json) as Generated;
   } catch {
-    throw new Error('Model did not return valid JSON. Raw response:\n' + text.slice(0, 2000));
+    throw new Error('Model did not return valid JSON. Raw response:\n' + raw.slice(0, 2000));
   }
 }
 
-function writeBundle(outDir: string, g: Generated): Manifest {
+function writeBundle(outDir: string, g: Generated): void {
   mkdirSync(join(outDir, 'quiz'), { recursive: true });
   const w = (rel: string, data: unknown) =>
     writeFileSync(join(outDir, rel), typeof data === 'string' ? data : JSON.stringify(data, null, 2) + '\n');
@@ -112,22 +104,20 @@ function writeBundle(outDir: string, g: Generated): Manifest {
     skills: 'skills.json',
   };
   w('manifest.json', manifest);
-  return manifest;
 }
 
 async function main() {
-  const pdfPath = process.argv[2];
-  if (!pdfPath) {
-    console.error('Usage: ANTHROPIC_API_KEY=... node teacher/author-chapter/generate.ts <chapter.pdf> [slug]');
-    process.exit(1);
-  }
-  if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
-    console.error('Set ANTHROPIC_API_KEY (your Claude API key) first, e.g.\n  export ANTHROPIC_API_KEY=sk-ant-...');
+  const source = process.argv[2];
+  if (!source) {
+    console.error('Usage: OPENCODE_API_KEY=... node teacher/author-chapter/generate.ts <source.pdf|.md|.txt> [slug]');
     process.exit(1);
   }
 
-  console.log(`• Reading ${basename(pdfPath)} and generating the chapter with ${MODEL}…`);
-  const g = await generate(pdfPath, process.argv[3]);
+  console.log(`• Extracting ${basename(source)}…`);
+  const text = await extractSource(source);
+
+  console.log(`• Generating the chapter with ${MODEL} (OpenCode Zen)…`);
+  const g = await generate(text, process.argv[3]);
 
   const outDir = resolve('content', g.slug);
   writeBundle(outDir, g);
@@ -135,7 +125,7 @@ async function main() {
 
   const issues = validateBundle(await loadBundle(outDir));
   if (issues.length) {
-    console.error(`✗ Generated bundle has ${issues.length} issue(s) — review/fix and re-run the build:`);
+    console.error(`✗ Generated bundle has ${issues.length} issue(s) — review/fix (or try another model) and re-run:`);
     for (const i of issues) console.error(`  ${i.path}: ${i.message}`);
     process.exit(1);
   }

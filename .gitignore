@@ -2,3 +2,7 @@ node_modules/
 *.log
 .DS_Store
 dist/
+
+# secrets — never commit
+.env
+.env.*
