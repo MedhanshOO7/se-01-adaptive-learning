@@ -14,6 +14,38 @@ import { THEME_CSS } from './theme.ts';
 
 const CSS = THEME_CSS;
 
+// Teacher page gets its own palette (blended from two random colors: #ac77da + #d9bbed →
+// base #c399e4, a violet→magenta) plus a Spline-style animated gradient-blob hero.
+const TEACHER_CSS = `
+:root{
+  --paper:#fbfafc; --surface:#ffffff; --surface-2:#f9f6fb;
+  --ink:#22172b; --muted:#776586; --line:#e6dfec;
+  --brand:#8d39d0; --brand-2:#cb34a9; --brand-ink:#ffffff;
+  --ok:#0e8f8a; --bad:#d6436b;
+  --shadow:0 1px 2px rgba(34,23,43,.05), 0 14px 34px -16px rgba(141,57,208,.24);
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#140d19; --surface:#1f1726; --surface-2:#2a2032;
+  --ink:#edeaf0; --muted:#a99eb3; --line:#392d43;
+  --brand:#b97de8; --brand-2:#d978c3; --brand-ink:#140d19;
+  --ok:#49cfc6; --bad:#ff7aa0;
+  --shadow:0 1px 2px rgba(0,0,0,.35), 0 18px 40px -20px rgba(185,125,232,.3);
+}}
+/* Spline-style fluid hero: drifting, blurred gradient blobs over a dark base. */
+.t-hero{position:relative;overflow:hidden;border-radius:24px;padding:38px 30px;margin:6px 0 24px;
+  background:#160d1e;box-shadow:var(--shadow);isolation:isolate}
+.t-hero h1,.t-hero p{position:relative;z-index:1;color:#fff}
+.t-hero h1{margin:.05em 0 .2em}.t-hero p{color:rgba(255,255,255,.82);margin:0;max-width:48ch}
+.t-hero .eyebrow{font-weight:650;font-size:.8rem;color:rgba(255,255,255,.7);margin:0 0 .3em}
+.blob{position:absolute;border-radius:50%;filter:blur(42px);opacity:.9;mix-blend-mode:screen;z-index:0}
+.b1{width:280px;height:280px;background:var(--brand);top:-90px;left:-50px;animation:drift1 15s ease-in-out infinite}
+.b2{width:240px;height:240px;background:var(--brand-2);top:-50px;right:-40px;animation:drift2 19s ease-in-out infinite}
+.b3{width:220px;height:220px;background:#4d6bff;bottom:-110px;left:38%;animation:drift3 17s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,30px) scale(1.15)}}
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1.1)}50%{transform:translate(-50px,40px) scale(.9)}}
+@keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-40px) scale(1.2)}}
+`;
+
 export async function buildTeacher(chapters: { title: string; bundle: string }[], outFile: string): Promise<string> {
   const runtimeJs = await bundleRuntime('SE01');
   const configs = [];
@@ -26,11 +58,15 @@ export async function buildTeacher(chapters: { title: string; bundle: string }[]
 
   const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Teacher dashboard — SE-01</title><style>${CSS}</style></head>
+<title>Teacher dashboard — SE-01</title><style>${CSS}${TEACHER_CSS}</style></head>
 <body><main>
 <a class="back" href="/">← all demos</a>
-<h1>Teacher dashboard</h1>
-<p class="sub">Per-skill progress from this device. (Local demo — no sync server yet.)</p>
+<section class="t-hero">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <p class="eyebrow">Teacher view</p>
+  <h1>Where each student stands</h1>
+  <p>Per-skill progress from this device — teal is solid, pink needs practice. (Local demo — no sync server yet.)</p>
+</section>
 <div id="root"></div>
 </main>
 <script>${runtimeJs}</script>
