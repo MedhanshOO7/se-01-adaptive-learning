@@ -2,8 +2,8 @@
 // with skill tags, the skill graph, and the integrity/encryption secret) and this script.
 // Everything here runs offline in the browser.
 
-import { openEventStore, memoryBackend, type EventStore } from './store.ts';
-import { indexedDbBackend } from './idb.ts';
+import { openEventStore, memoryBackend, type EventStore, type StorageBackend } from './store.ts';
+import { indexedDbBackend, indexedDbAvailable, localStorageBackend } from './idb.ts';
 import { wireRuntime, type RuntimeConfig } from './dom.ts';
 
 export interface InjectedConfig extends RuntimeConfig {
@@ -11,12 +11,27 @@ export interface InjectedConfig extends RuntimeConfig {
   secret: string;
 }
 
-export async function bootstrap(config: InjectedConfig): Promise<EventStore> {
-  let backend;
+// Durable where possible: IndexedDB, else localStorage (works on file:// where IndexedDB is
+// blocked), else in-memory (progress won't survive reload — private mode / blocked storage).
+async function pickBackend(chapterId: string): Promise<{ backend: StorageBackend; kind: string }> {
+  const key = `se01:${chapterId}`;
+  if (await indexedDbAvailable()) return { backend: indexedDbBackend(key), kind: 'indexeddb' };
   try {
-    backend = 'indexedDB' in globalThis ? indexedDbBackend(`se01:${config.chapterId}`) : memoryBackend();
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('se01-probe', '1');
+      localStorage.removeItem('se01-probe');
+      return { backend: localStorageBackend(key), kind: 'localstorage' };
+    }
   } catch {
-    backend = memoryBackend(); // private mode / blocked storage
+    /* fall through */
+  }
+  return { backend: memoryBackend(), kind: 'memory' };
+}
+
+export async function bootstrap(config: InjectedConfig): Promise<EventStore> {
+  const { backend, kind } = await pickBackend(config.chapterId);
+  if (kind === 'memory') {
+    console.warn('[se01] no durable storage available — progress will not survive a reload.');
   }
 
   const store = await openEventStore({

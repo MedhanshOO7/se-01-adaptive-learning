@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { openEventStore, memoryBackend } from '../student/runtime/store.ts';
+import { localStorageBackend } from '../student/runtime/idb.ts';
 import { chooseRemediation, prerequisitesOf } from '../student/runtime/adaptation.ts';
 import { loadBundle } from '../teacher/build/load.ts';
 
@@ -31,6 +32,28 @@ test('concurrent appends stay serialized and keep the chain intact', async () =>
   assert.equal(events.length, 2);
   assert.equal(events[1].prevHash, events[0].hash);
   assert.deepEqual(await store.verify(), { ok: true });
+});
+
+test('localStorage backend persists the chain across a reopen (file:// fallback)', async () => {
+  const m = new Map<string, string>();
+  const ls = {
+    getItem: (k: string) => m.get(k) ?? null,
+    setItem: (k: string, v: string) => void m.set(k, String(v)),
+    removeItem: (k: string) => void m.delete(k),
+    clear: () => m.clear(),
+    key: (i: number) => [...m.keys()][i] ?? null,
+    get length() { return m.size; },
+  } as Storage;
+
+  const s1 = await openEventStore({ backend: localStorageBackend('se01:c', ls), ...storeOpts });
+  await s1.append({ quizId: 'q1', questionIndex: 0, skillId: 's', selectedOption: 0, correct: true });
+
+  // Simulate reopening the page: a fresh backend/store over the same storage.
+  const s2 = await openEventStore({ backend: localStorageBackend('se01:c', ls), ...storeOpts });
+  const events = await s2.list();
+  assert.equal(events.length, 1);
+  assert.equal(events[0].correct, true);
+  assert.deepEqual(await s2.verify(), { ok: true });
 });
 
 test('a second attempt at the same question is not independent', async () => {

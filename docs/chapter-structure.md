@@ -95,9 +95,17 @@ secret. Nothing is fetched at learn time.
 
 ## 3. Student state (written at runtime)
 
-Attempts are stored locally in **IndexedDB** (`se01:<chapterId>`) as an append-only,
-AES-GCM-encrypted, HMAC hash-chained log of `EvidenceEvent`s (see `student/runtime/store.ts`).
-This survives reload/restart and is the record personalization reads from.
+Attempts are an append-only, AES-GCM-encrypted, HMAC hash-chained log of `EvidenceEvent`s
+(see `student/runtime/store.ts`), stored under key `se01:<chapterId>`. The runtime picks the
+most durable store available (see `pickBackend` in `student/runtime/index.ts`):
+
+1. **IndexedDB** — normal case (served over http/https or a PWA).
+2. **localStorage** — fallback when IndexedDB is blocked, notably on `file://` in Chrome, so
+   a student who just saves and reopens the HTML keeps their progress.
+3. **in-memory** — last resort (private mode / all storage blocked); progress won't survive a
+   reload, and the runtime logs a warning.
+
+This is the record personalization reads from; it survives reload/restart in cases 1–2.
 
 ## Offline guarantee & open caveat
 
