@@ -6,6 +6,7 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { join, extname, resolve, normalize } from 'node:path';
 import { buildDemo } from './demo.ts';
+import { buildTeacher } from './teacher.ts';
 
 const DIST = resolve('dist');
 const PORT = Number(process.env.PORT ?? 4321);
@@ -24,7 +25,9 @@ const TYPES: Record<string, string> = {
 };
 
 function indexPage(): string {
-  const links = CHAPTERS.map((c) => `<a href="/${c.file}">▶ ${c.title}</a>`).join('\n');
+  const links =
+    CHAPTERS.map((c) => `<a href="/${c.file}">▶ ${c.title} <span style="opacity:.6;font-weight:400">· student</span></a>`).join('\n') +
+    `\n<a href="/teacher.html">▣ Teacher dashboard <span style="opacity:.6;font-weight:400">· progress on this device</span></a>`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>SE-01 demos</title>
 <style>:root{color-scheme:light dark}body{font:17px/1.6 system-ui,sans-serif;max-width:640px;margin:56px auto;padding:0 20px}
@@ -38,6 +41,7 @@ ${links}</body></html>`;
 async function main() {
   console.log('• Building demos…');
   for (const c of CHAPTERS) await buildDemo(resolve(c.bundle), join(DIST, c.file));
+  await buildTeacher(CHAPTERS, join(DIST, 'teacher.html'));
 
   createServer(async (req, res) => {
     const path = decodeURIComponent((req.url ?? '/').split('?')[0]);
