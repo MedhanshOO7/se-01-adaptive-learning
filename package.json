@@ -12,6 +12,7 @@
     "validate": "node teacher/build/validate.ts",
     "build": "node teacher/build/build.ts",
     "bundle:runtime": "node teacher/build/bundle-runtime.ts",
+    "serve": "node teacher/build/serve.ts",
     "test": "node --test"
   },
   "devDependencies": {

@@ -128,10 +128,7 @@ code{font-family:ui-monospace,monospace;background:color-mix(in srgb,var(--line)
 ul{padding-left:1.2em}
 `;
 
-async function main() {
-  const bundleDir = resolve(process.argv[2] ?? 'content/fractions');
-  const outFile = resolve(process.argv[3] ?? 'dist/demo.html');
-
+export async function buildDemo(bundleDir: string, outFile: string): Promise<string> {
   const bundle = await loadBundle(bundleDir);
   const issues = validateBundle(bundle);
   if (issues.length) throw new Error('Bundle invalid:\n' + issues.map((i) => `  ${i.path}: ${i.message}`).join('\n'));
@@ -202,6 +199,10 @@ document.getElementById('reset').onclick=function(){indexedDB.deleteDatabase('se
   mkdirSync(dirname(outFile), { recursive: true });
   writeFileSync(outFile, html);
   console.log(`✓ demo written → ${outFile}  (${(html.length / 1024).toFixed(1)} KB, self-contained)`);
+  return outFile;
 }
 
-main();
+// CLI: node teacher/build/demo.ts [bundleDir] [outFile]
+if (import.meta.url === `file://${process.argv[1]}`) {
+  await buildDemo(resolve(process.argv[2] ?? 'content/fractions'), resolve(process.argv[3] ?? 'dist/demo.html'));
+}
