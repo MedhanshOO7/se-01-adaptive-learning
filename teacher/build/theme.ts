@@ -32,6 +32,12 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   background-image:radial-gradient(120% 80% at 85% -10%, color-mix(in srgb,var(--brand) 16%,transparent), transparent 60%),
     radial-gradient(90% 60% at -10% 0%, color-mix(in srgb,var(--brand-2) 14%,transparent), transparent 55%);
   background-attachment:fixed;}
+/* +20% white wash over the background (light mode only — keeps dark depth intact) */
+@media (prefers-color-scheme:light){body{
+  background-image:linear-gradient(rgba(255,255,255,.2),rgba(255,255,255,.2)),
+    radial-gradient(120% 80% at 85% -10%, color-mix(in srgb,var(--brand) 16%,transparent), transparent 60%),
+    radial-gradient(90% 60% at -10% 0%, color-mix(in srgb,var(--brand-2) 14%,transparent), transparent 55%);
+}}
 main{max-width:720px;margin:0 auto;padding:40px 20px 96px}
 h1{font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.05;font-weight:800;letter-spacing:-0.03em;margin:.1em 0 .25em}
 h2{font-size:1.28rem;font-weight:750;letter-spacing:-0.02em;margin:1.9em 0 .4em}
