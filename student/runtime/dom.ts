@@ -38,6 +38,11 @@ function buildFollowup(question: Question, reason: string, uid: string): HTMLEle
   q.className = 'bk-question';
   q.id = `${uid}-q0`;
 
+  const tag = document.createElement('div');
+  tag.className = 'se01-tag';
+  tag.textContent = 'Personalised for you';
+  q.append(tag);
+
   const why = document.createElement('p');
   why.className = 'se01-remediation-reason';
   why.textContent = reason;
@@ -116,8 +121,11 @@ export function wireRuntime(config: RuntimeConfig, store: EventStore): () => voi
     shownPrompts.add(remediation.question.q);
     const uid = `se01-prereq-${followupCount++}`;
     const node = buildFollowup(remediation.question, remediation.reason, uid);
-    // Insert after the quiz block that was just answered so the step-back reads in order.
+    // Insert after the quiz block that was just answered. (After the whole block, not the
+    // single question, so the original question indexing stays intact.)
     anchor.insertAdjacentElement('afterend', node);
+    // Make the step-back noticeable: bring it into view. (No-op outside a real browser.)
+    node.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
   }
 
   const handler = (e: Event) => {

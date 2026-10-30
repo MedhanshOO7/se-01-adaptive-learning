@@ -49,3 +49,4 @@ export { wireRuntime } from './dom.ts';
 export { openEventStore, memoryBackend } from './store.ts';
 export { indexedDbBackend } from './idb.ts';
 export { chooseRemediation, prerequisitesOf } from './adaptation.ts';
+export { summariseSkills } from './summary.ts';

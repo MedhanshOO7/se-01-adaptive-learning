@@ -35,8 +35,15 @@ validator in `shared/schema/validate.ts` enforces them.
 9. **Hand to the teacher to review** correctness, answer keys, and prerequisite edges. AI
    output is a draft, not an approval.
 
-Optional: `node teacher/author-chapter/scaffold.ts <slug> "<Title>" <lang>` creates the
-directory with starter files to fill in.
+## Two ways to run this
+
+- **Automated (one command):** `ANTHROPIC_API_KEY=... npm run author -- <chapter.pdf> [slug]`
+  sends the PDF to Claude, writes the whole bundle to `content/<slug>/`, validates it, and
+  builds the student HTML. Use this when a teacher just wants to hand in a PDF. Review the
+  result (steps 3 + 9 below) before trusting it.
+- **Manual / assisted:** follow the steps below yourself, writing each file. Optional starter:
+  `node teacher/author-chapter/scaffold.ts <slug> "<Title>" <lang>` creates the directory with
+  placeholder files to fill in.
 
 ## mr-md lesson syntax (`chapter.md`)
 

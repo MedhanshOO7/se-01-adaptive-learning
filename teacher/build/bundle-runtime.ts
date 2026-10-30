@@ -8,8 +8,9 @@ import { dirname, resolve } from 'node:path';
 const here = dirname(fileURLToPath(import.meta.url));
 const entry = resolve(here, '../../student/runtime/index.ts');
 
-/** Returns the bundled runtime JS as a string (no file written). */
-export async function bundleRuntime(): Promise<string> {
+/** Returns the bundled runtime JS as a string (no file written). Pass `globalName` to also
+ *  expose the runtime's exports (e.g. `bootstrap`) on a browser global for demos/debugging. */
+export async function bundleRuntime(globalName?: string): Promise<string> {
   const result = await build({
     entryPoints: [entry],
     bundle: true,
@@ -18,6 +19,7 @@ export async function bundleRuntime(): Promise<string> {
     target: 'es2022',
     minify: true,
     write: false,
+    ...(globalName ? { globalName } : {}),
   });
   return result.outputFiles[0].text;
 }
