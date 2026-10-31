@@ -6,9 +6,9 @@ The in-house compiler turns a chapter folder into offline lesson pages with ques
 
 A Class 9 "Journey Inside the Atom" chapter, built with `npm run build:e2e`: read the chapter, answer the chapter check (including a deliberately wrong answer to show the feedback), complete the chapter, and see the six-skill radar profile route to a personalised depth.
 
-[![Demo: reading a chapter, the chapter check, and the adaptive skill profile](docs/media/demo-poster.jpg)](docs/media/demo.mp4)
+![Demo: reading a chapter, the chapter check, and the adaptive skill profile](docs/media/demo.gif)
 
-Click the frame above to open [docs/media/demo.mp4](docs/media/demo.mp4) and play it.
+(GitHub doesn't inline-play `.mp4` files committed to a repo, so the GIF above is the demo. The same recording at full quality is in [docs/media/demo.mp4](docs/media/demo.mp4) — download it to watch; GitHub will only offer it as a raw file, not a player.)
 
 ```sh
 npm install
