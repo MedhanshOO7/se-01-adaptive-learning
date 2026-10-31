@@ -1,4 +1,5 @@
-import { resolve } from 'node:path';
+import { relative, resolve } from 'node:path';
+import { findLearningRoot, compileLearningPage } from '../teacher/learning/build.ts';
 import { pathToFileURL } from 'node:url';
 import engine from './engine.ts';
 import { verifyQuizMounts } from './quiz-mounts.ts';
@@ -6,7 +7,7 @@ import type { CompileInput, MarkdownCompiler } from './types.ts';
 
 export type { CompileInput, MarkdownCompiler } from './types.ts';
 
-/** Use mr-md by default, or load a trusted local adapter module. */
+/** Use the in-house renderer by default, or load a trusted local adapter module. */
 export async function loadCompiler(modulePath?: string): Promise<MarkdownCompiler> {
   if (!modulePath) return engine;
   const { default: compiler } = await import(pathToFileURL(resolve(modulePath)).href);
@@ -18,6 +19,8 @@ export async function loadCompiler(modulePath?: string): Promise<MarkdownCompile
 
 /** The only rendering operation the chapter builder needs. */
 export async function compileMarkdown(input: CompileInput, compiler: MarkdownCompiler = engine): Promise<string> {
+  const root = await findLearningRoot(input.lessonPath);
+  if (root) return compileLearningPage(root, relative(root, resolve(input.lessonPath)), compiler);
   const html = await compiler.compile(input);
   if (typeof html !== 'string' || !html.trim()) {
     throw new Error(`Compiler "${compiler.name}" returned empty or invalid HTML.`);

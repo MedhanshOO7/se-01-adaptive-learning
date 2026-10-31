@@ -16,12 +16,11 @@ export function injectPreview(html: string, script: string): string {
 export async function watchWithPreview(input: CompileInput, compiler: MarkdownCompiler): Promise<void> {
   const scriptPath = join(input.bundleDir, 'se01-preview.js');
   const revision = async () => {
-    const [lesson, script] = await Promise.all([stat(input.lessonPath), stat(scriptPath)]);
-    return `${lesson.mtimeMs}-${lesson.size}-${script.mtimeMs}-${script.size}`;
+    const [lesson, script] = await Promise.all([stat(input.lessonPath), stat(scriptPath).catch(() => null)]);
+    return `${lesson.mtimeMs}-${lesson.size}-${script?.mtimeMs ?? 0}-${script?.size ?? 0}`;
   };
   // Fail early on bad lesson or sidecar rather than starting a broken preview.
   await compileMarkdown(input, compiler);
-  await readFile(scriptPath, 'utf8');
   const port = Number(process.env.PORT || 4173);
   const server = createServer(async (req, res) => {
     try {
@@ -30,7 +29,7 @@ export async function watchWithPreview(input: CompileInput, compiler: MarkdownCo
         res.writeHead(200, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' });
         res.end(await revision());
       } else if (path === '/') {
-        const [html, script] = await Promise.all([compileMarkdown(input, compiler), readFile(scriptPath, 'utf8')]);
+        const [html, script] = await Promise.all([compileMarkdown(input, compiler), readFile(scriptPath, 'utf8').catch((error: NodeJS.ErrnoException) => { if (error.code === 'ENOENT') return ''; throw error; })]);
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
         res.end(injectPreview(html, script));
       } else {
