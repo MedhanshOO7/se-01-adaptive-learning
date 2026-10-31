@@ -6,3 +6,11 @@ dist/
 # secrets — never commit
 .env
 .env.*
+
+# Local compiler examples and mr-md preview output
+examples/
+out/
+
+# Local experiments and generated playground content
+playground/
+playgrounds/

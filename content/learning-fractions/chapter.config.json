@@ -1,0 +1,670 @@
+{
+  "schemaVersion": 1,
+  "id": "fractions-learning",
+  "revision": "1",
+  "title": "Fractions",
+  "entry": "chapter.md",
+  "pages": [
+    {
+      "file": "chapter.md",
+      "title": "Fractions chapter",
+      "quizzes": [
+        "chapter-check"
+      ]
+    },
+    {
+      "file": "lessons/foundations.md",
+      "title": "Fractions workshop",
+      "quizzes": [
+        "workshop"
+      ]
+    },
+    {
+      "file": "lessons/next.md",
+      "title": "Fractions in everyday problems",
+      "quizzes": []
+    },
+    {
+      "file": "lessons/equal-parts.md",
+      "title": "Equal parts practice",
+      "quizzes": [
+        "target-equal-parts"
+      ]
+    },
+    {
+      "file": "lessons/equivalence.md",
+      "title": "Equivalence practice",
+      "quizzes": [
+        "target-equivalence"
+      ]
+    },
+    {
+      "file": "lessons/comparison.md",
+      "title": "Comparison practice",
+      "quizzes": [
+        "target-comparison"
+      ]
+    },
+    {
+      "file": "lessons/simplifying.md",
+      "title": "Simplifying practice",
+      "quizzes": [
+        "target-simplifying"
+      ]
+    },
+    {
+      "file": "lessons/addition.md",
+      "title": "Addition practice",
+      "quizzes": [
+        "target-addition"
+      ]
+    },
+    {
+      "file": "lessons/reasoning.md",
+      "title": "Reasoning practice",
+      "quizzes": [
+        "target-reasoning"
+      ]
+    }
+  ],
+  "topics": [
+    {
+      "id": "equal-parts",
+      "label": "Equal parts"
+    },
+    {
+      "id": "equivalence",
+      "label": "Equivalence"
+    },
+    {
+      "id": "comparison",
+      "label": "Comparison"
+    },
+    {
+      "id": "simplifying",
+      "label": "Simplifying"
+    },
+    {
+      "id": "addition",
+      "label": "Addition"
+    },
+    {
+      "id": "reasoning",
+      "label": "Reasoning"
+    }
+  ],
+  "hexagon": {
+    "axes": [
+      {
+        "id": "equal-parts",
+        "label": "Equal parts",
+        "topics": [
+          "equal-parts"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      },
+      {
+        "id": "equivalence",
+        "label": "Equivalence",
+        "topics": [
+          "equivalence"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      },
+      {
+        "id": "comparison",
+        "label": "Comparison",
+        "topics": [
+          "comparison"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      },
+      {
+        "id": "simplifying",
+        "label": "Simplifying",
+        "topics": [
+          "simplifying"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      },
+      {
+        "id": "addition",
+        "label": "Addition",
+        "topics": [
+          "addition"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      },
+      {
+        "id": "reasoning",
+        "label": "Reasoning",
+        "topics": [
+          "reasoning"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      }
+    ],
+    "evidence": "latest",
+    "hintedCredit": 0.5,
+    "bands": [
+      {
+        "below": 50,
+        "label": "Build foundations"
+      },
+      {
+        "below": 75,
+        "label": "Developing"
+      },
+      {
+        "below": 101,
+        "label": "Secure"
+      }
+    ],
+    "evidenceWindow": 1
+  },
+  "quizzes": [
+    {
+      "id": "chapter-check",
+      "title": "Your chapter check",
+      "questions": [
+        {
+          "id": "check-parts",
+          "type": "single",
+          "prompt": "A whole is divided into four equal pieces. What is one piece?",
+          "topics": [
+            "equal-parts"
+          ],
+          "weight": 1,
+          "options": [
+            "1/4",
+            "1/3",
+            "4/1"
+          ],
+          "answer": 0,
+          "explanation": "Four equal pieces make one whole, so each piece is one quarter."
+        },
+        {
+          "id": "check-equiv",
+          "type": "multiple",
+          "prompt": "Select every fraction equivalent to 1/2.",
+          "topics": [
+            "equivalence"
+          ],
+          "weight": 1,
+          "options": [
+            "2/4",
+            "3/6",
+            "2/3"
+          ],
+          "answer": [
+            0,
+            1
+          ],
+          "hint": "Multiply the numerator and denominator by the same number.",
+          "explanation": "2/4 and 3/6 both describe one half."
+        },
+        {
+          "id": "check-order",
+          "type": "ordering",
+          "prompt": "Arrange these fractions from smallest to largest.",
+          "topics": [
+            "comparison"
+          ],
+          "weight": 1,
+          "options": [
+            "3/4",
+            "1/4",
+            "1/2"
+          ],
+          "answer": [
+            1,
+            2,
+            0
+          ],
+          "explanation": "In quarters: 1/4, 2/4, 3/4."
+        },
+        {
+          "id": "check-simple",
+          "type": "numeric",
+          "prompt": "Write 6/8 in simplest form.",
+          "topics": [
+            "simplifying"
+          ],
+          "weight": 1,
+          "answer": "3/4",
+          "simplestForm": true,
+          "explanation": "Divide both terms by 2 to get 3/4."
+        },
+        {
+          "id": "check-add",
+          "type": "numeric",
+          "prompt": "What is 1/4 + 2/4?",
+          "topics": [
+            "addition"
+          ],
+          "weight": 1,
+          "answer": "3/4",
+          "explanation": "Add the numerators when the denominators match."
+        },
+        {
+          "id": "check-reason",
+          "type": "single",
+          "level": "hots",
+          "prompt": "Asha says 1/3 is larger than 1/2 because 3 is larger than 2. Which explanation resolves the mistake?",
+          "topics": [
+            "reasoning"
+          ],
+          "weight": 1,
+          "options": [
+            "More equal pieces means each piece is smaller.",
+            "A larger denominator always means a larger fraction.",
+            "The fractions are equal."
+          ],
+          "answer": 0,
+          "explanation": "Dividing the same whole into three equal parts makes smaller pieces than dividing it into two."
+        }
+      ]
+    },
+    {
+      "id": "workshop",
+      "title": "Try these after the workshop",
+      "questions": [
+        {
+          "id": "practice-parts",
+          "type": "single",
+          "prompt": "A whole is divided into four equal pieces. What is one piece?",
+          "topics": [
+            "equal-parts"
+          ],
+          "weight": 1,
+          "options": [
+            "1/4",
+            "1/3",
+            "4/1"
+          ],
+          "answer": 0,
+          "explanation": "Four equal pieces make one whole, so each piece is one quarter."
+        },
+        {
+          "id": "practice-equiv",
+          "type": "multiple",
+          "prompt": "Select every fraction equivalent to 1/2.",
+          "topics": [
+            "equivalence"
+          ],
+          "weight": 1,
+          "options": [
+            "2/4",
+            "3/6",
+            "2/3"
+          ],
+          "answer": [
+            0,
+            1
+          ],
+          "hint": "Multiply the numerator and denominator by the same number.",
+          "explanation": "2/4 and 3/6 both describe one half."
+        },
+        {
+          "id": "practice-order",
+          "type": "ordering",
+          "prompt": "Arrange these fractions from smallest to largest.",
+          "topics": [
+            "comparison"
+          ],
+          "weight": 1,
+          "options": [
+            "3/4",
+            "1/4",
+            "1/2"
+          ],
+          "answer": [
+            1,
+            2,
+            0
+          ],
+          "explanation": "In quarters: 1/4, 2/4, 3/4."
+        },
+        {
+          "id": "practice-simple",
+          "type": "numeric",
+          "prompt": "Write 6/8 in simplest form.",
+          "topics": [
+            "simplifying"
+          ],
+          "weight": 1,
+          "answer": "3/4",
+          "simplestForm": true,
+          "explanation": "Divide both terms by 2 to get 3/4."
+        },
+        {
+          "id": "practice-add",
+          "type": "numeric",
+          "prompt": "What is 1/4 + 2/4?",
+          "topics": [
+            "addition"
+          ],
+          "weight": 1,
+          "answer": "3/4",
+          "explanation": "Add the numerators when the denominators match."
+        },
+        {
+          "id": "practice-reason",
+          "type": "single",
+          "level": "hots",
+          "prompt": "Asha says 1/3 is larger than 1/2 because 3 is larger than 2. Which explanation resolves the mistake?",
+          "topics": [
+            "reasoning"
+          ],
+          "weight": 1,
+          "options": [
+            "More equal pieces means each piece is smaller.",
+            "A larger denominator always means a larger fraction.",
+            "The fractions are equal."
+          ],
+          "answer": 0,
+          "explanation": "Dividing the same whole into three equal parts makes smaller pieces than dividing it into two."
+        }
+      ]
+    },
+    {
+      "id": "target-equal-parts",
+      "title": "Check your understanding again",
+      "questions": [
+        {
+          "id": "target-equal-parts-question",
+          "type": "single",
+          "prompt": "A whole is divided into four equal pieces. What is one piece?",
+          "topics": [
+            "equal-parts"
+          ],
+          "weight": 1,
+          "options": [
+            "1/4",
+            "1/3",
+            "4/1"
+          ],
+          "answer": 0,
+          "explanation": "Four equal pieces make one whole, so each piece is one quarter."
+        }
+      ]
+    },
+    {
+      "id": "target-equivalence",
+      "title": "Check your understanding again",
+      "questions": [
+        {
+          "id": "target-equivalence-question",
+          "type": "multiple",
+          "prompt": "Select every fraction equivalent to 1/2.",
+          "topics": [
+            "equivalence"
+          ],
+          "weight": 1,
+          "options": [
+            "2/4",
+            "3/6",
+            "2/3"
+          ],
+          "answer": [
+            0,
+            1
+          ],
+          "hint": "Multiply the numerator and denominator by the same number.",
+          "explanation": "2/4 and 3/6 both describe one half."
+        }
+      ]
+    },
+    {
+      "id": "target-comparison",
+      "title": "Check your understanding again",
+      "questions": [
+        {
+          "id": "target-comparison-question",
+          "type": "ordering",
+          "prompt": "Arrange these fractions from smallest to largest.",
+          "topics": [
+            "comparison"
+          ],
+          "weight": 1,
+          "options": [
+            "3/4",
+            "1/4",
+            "1/2"
+          ],
+          "answer": [
+            1,
+            2,
+            0
+          ],
+          "explanation": "In quarters: 1/4, 2/4, 3/4."
+        }
+      ]
+    },
+    {
+      "id": "target-simplifying",
+      "title": "Check your understanding again",
+      "questions": [
+        {
+          "id": "target-simplifying-question",
+          "type": "numeric",
+          "prompt": "Write 6/8 in simplest form.",
+          "topics": [
+            "simplifying"
+          ],
+          "weight": 1,
+          "answer": "3/4",
+          "simplestForm": true,
+          "explanation": "Divide both terms by 2 to get 3/4."
+        }
+      ]
+    },
+    {
+      "id": "target-addition",
+      "title": "Check your understanding again",
+      "questions": [
+        {
+          "id": "target-addition-question",
+          "type": "numeric",
+          "prompt": "What is 1/4 + 2/4?",
+          "topics": [
+            "addition"
+          ],
+          "weight": 1,
+          "answer": "3/4",
+          "explanation": "Add the numerators when the denominators match."
+        }
+      ]
+    },
+    {
+      "id": "target-reasoning",
+      "title": "Check your understanding again",
+      "questions": [
+        {
+          "id": "target-reasoning-question",
+          "type": "single",
+          "level": "hots",
+          "prompt": "Asha says 1/3 is larger than 1/2 because 3 is larger than 2. Which explanation resolves the mistake?",
+          "topics": [
+            "reasoning"
+          ],
+          "weight": 1,
+          "options": [
+            "More equal pieces means each piece is smaller.",
+            "A larger denominator always means a larger fraction.",
+            "The fractions are equal."
+          ],
+          "answer": 0,
+          "explanation": "Dividing the same whole into three equal parts makes smaller pieces than dividing it into two."
+        }
+      ]
+    }
+  ],
+  "completion": {
+    "quizzes": [
+      "chapter-check"
+    ]
+  },
+  "routing": {
+    "rules": [
+      {
+        "id": "ready",
+        "priority": 100,
+        "when": {
+          "all": [
+            {
+              "axis": "equal-parts",
+              "op": ">=",
+              "value": 75
+            },
+            {
+              "axis": "equivalence",
+              "op": ">=",
+              "value": 75
+            },
+            {
+              "axis": "comparison",
+              "op": ">=",
+              "value": 75
+            },
+            {
+              "axis": "simplifying",
+              "op": ">=",
+              "value": 75
+            },
+            {
+              "axis": "addition",
+              "op": ">=",
+              "value": 75
+            },
+            {
+              "axis": "reasoning",
+              "op": ">=",
+              "value": 75
+            }
+          ]
+        },
+        "file": "lessons/next.md",
+        "reason": "Your topic evidence is strong across this chapter. Apply it to everyday problems."
+      },
+      {
+        "id": "support-equal-parts",
+        "priority": 50,
+        "when": {
+          "all": [
+            {
+              "weakest": "equal-parts"
+            },
+            {
+              "axis": "equal-parts",
+              "op": "<",
+              "value": 75
+            }
+          ]
+        },
+        "file": "lessons/equal-parts.md",
+        "reason": "Equal parts is one of your weakest topics. Revisit the idea, then try a focused question."
+      },
+      {
+        "id": "support-equivalence",
+        "priority": 50,
+        "when": {
+          "all": [
+            {
+              "weakest": "equivalence"
+            },
+            {
+              "axis": "equivalence",
+              "op": "<",
+              "value": 75
+            }
+          ]
+        },
+        "file": "lessons/equivalence.md",
+        "reason": "Equivalence is one of your weakest topics. Revisit the idea, then try a focused question."
+      },
+      {
+        "id": "support-comparison",
+        "priority": 50,
+        "when": {
+          "all": [
+            {
+              "weakest": "comparison"
+            },
+            {
+              "axis": "comparison",
+              "op": "<",
+              "value": 75
+            }
+          ]
+        },
+        "file": "lessons/comparison.md",
+        "reason": "Comparison is one of your weakest topics. Revisit the idea, then try a focused question."
+      },
+      {
+        "id": "support-simplifying",
+        "priority": 50,
+        "when": {
+          "all": [
+            {
+              "weakest": "simplifying"
+            },
+            {
+              "axis": "simplifying",
+              "op": "<",
+              "value": 75
+            }
+          ]
+        },
+        "file": "lessons/simplifying.md",
+        "reason": "Simplifying is one of your weakest topics. Revisit the idea, then try a focused question."
+      },
+      {
+        "id": "support-addition",
+        "priority": 50,
+        "when": {
+          "all": [
+            {
+              "weakest": "addition"
+            },
+            {
+              "axis": "addition",
+              "op": "<",
+              "value": 75
+            }
+          ]
+        },
+        "file": "lessons/addition.md",
+        "reason": "Addition is one of your weakest topics. Revisit the idea, then try a focused question."
+      },
+      {
+        "id": "support-reasoning",
+        "priority": 50,
+        "when": {
+          "all": [
+            {
+              "weakest": "reasoning"
+            },
+            {
+              "axis": "reasoning",
+              "op": "<",
+              "value": 75
+            }
+          ]
+        },
+        "file": "lessons/reasoning.md",
+        "reason": "Reasoning is one of your weakest topics. Revisit the idea, then try a focused question."
+      }
+    ],
+    "fallback": {
+      "file": "lessons/foundations.md",
+      "reason": "Build a little more evidence in the workshop before continuing."
+    }
+  }
+}

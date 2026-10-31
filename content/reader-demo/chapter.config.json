@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "id": "reader-demo",
+  "revision": "1",
+  "title": "A little more about fractions",
+  "entry": "chapter.md",
+  "pages": [
+    {
+      "file": "chapter.md",
+      "title": "A little more about fractions",
+      "quizzes": [
+        "check"
+      ]
+    },
+    {
+      "file": "practice.md",
+      "title": "A closer look at fractions",
+      "quizzes": []
+    },
+    {
+      "file": "next.md",
+      "title": "Adding fractions",
+      "quizzes": []
+    }
+  ],
+  "topics": [
+    {
+      "id": "parts",
+      "label": "Equal parts"
+    },
+    {
+      "id": "meaning",
+      "label": "Meaning"
+    },
+    {
+      "id": "equivalence",
+      "label": "Equivalence"
+    },
+    {
+      "id": "compare",
+      "label": "Compare"
+    },
+    {
+      "id": "order",
+      "label": "Order"
+    },
+    {
+      "id": "reason",
+      "label": "Reasoning"
+    }
+  ],
+  "hexagon": {
+    "axes": [
+      {
+        "id": "parts",
+        "label": "Equal parts",
+        "topics": [
+          "parts"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      },
+      {
+        "id": "meaning",
+        "label": "Meaning",
+        "topics": [
+          "meaning"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      },
+      {
+        "id": "equivalence",
+        "label": "Equivalence",
+        "topics": [
+          "equivalence"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      },
+      {
+        "id": "compare",
+        "label": "Compare",
+        "topics": [
+          "compare"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      },
+      {
+        "id": "order",
+        "label": "Order",
+        "topics": [
+          "order"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      },
+      {
+        "id": "reason",
+        "label": "Reasoning",
+        "topics": [
+          "reason"
+        ],
+        "aggregation": "average",
+        "minEvidence": 1
+      }
+    ],
+    "evidence": "latest",
+    "hintedCredit": 0.5,
+    "evidenceWindow": 5,
+    "bands": [
+      {
+        "below": 50,
+        "label": "Explore again"
+      },
+      {
+        "below": 80,
+        "label": "Developing"
+      },
+      {
+        "below": 101,
+        "label": "Confident"
+      }
+    ]
+  },
+  "quizzes": [
+    {
+      "id": "check",
+      "title": "Try it yourself",
+      "questions": [
+        {
+          "id": "parts",
+          "type": "single",
+          "prompt": "A whole is cut into four equal pieces. What fraction is one piece?",
+          "options": [
+            "1/4",
+            "1/2",
+            "4/1"
+          ],
+          "answer": 0,
+          "topics": [
+            "parts",
+            "meaning"
+          ],
+          "explanation": "One of four equal pieces is one quarter.",
+          "weight": 1
+        },
+        {
+          "id": "equivalent",
+          "type": "multiple",
+          "prompt": "Which fractions are equal to one half?",
+          "options": [
+            "2/4",
+            "3/6",
+            "2/3"
+          ],
+          "answer": [
+            0,
+            1
+          ],
+          "topics": [
+            "equivalence"
+          ],
+          "explanation": "Both 2/4 and 3/6 represent the same half.",
+          "weight": 1
+        },
+        {
+          "id": "order",
+          "type": "ordering",
+          "prompt": "Arrange these fractions from smallest to largest.",
+          "options": [
+            "3/4",
+            "1/4",
+            "1/2"
+          ],
+          "answer": [
+            1,
+            2,
+            0
+          ],
+          "topics": [
+            "order",
+            "compare"
+          ],
+          "explanation": "For the same whole, one quarter is less than one half, which is less than three quarters.",
+          "weight": 1
+        },
+        {
+          "id": "reason",
+          "type": "numeric",
+          "level": "hots",
+          "prompt": "A recipe uses 1/2 cup. You double it. How many cups do you need?",
+          "answer": "1",
+          "topics": [
+            "reason"
+          ],
+          "hint": "Two halves make a whole.",
+          "explanation": "Twice one half is one whole cup.",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "completion": {
+    "quizzes": [
+      "check"
+    ]
+  },
+  "routing": {
+    "rules": [
+      {
+        "id": "revisit",
+        "priority": 10,
+        "when": {
+          "axis": "parts",
+          "op": "<",
+          "value": 75
+        },
+        "file": "practice.md",
+        "reason": "A quick look at equal parts will help the next ideas click."
+      }
+    ],
+    "fallback": {
+      "file": "next.md",
+      "reason": "Build on equal parts and learn how fractions add together."
+    }
+  },
+  "cover": {
+    "label": "CHAPTER",
+    "color": "#526b55",
+    "artwork": "orbit"
+  }
+}
