@@ -1,3 +1,4 @@
+import { buildLearningChapter } from '../learning/build.ts';
 // Validate a chapter, compile its Markdown, then inject the student runtime.
 
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -39,6 +40,7 @@ function resolveSecret(outDir: string): string {
 }
 
 export async function buildChapter(bundleDir: string, outDir: string, compiler?: MarkdownCompiler): Promise<string> {
+  if (existsSync(join(bundleDir, 'chapter.config.json'))) return buildLearningChapter(bundleDir, outDir, compiler ?? await loadCompiler());
   const bundle = await loadBundle(bundleDir);
   const issues = validateBundle(bundle);
   if (issues.length) {
