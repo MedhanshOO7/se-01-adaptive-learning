@@ -21,6 +21,14 @@ docs/           design docs
 
 `teacher/` and `student/` never import from each other — only from `shared/`.
 
+## Teacher AI skills
+
+- [Dependency depth](skills/dependency-depth/SKILL.md) turns a topic Markdown file into
+  linked theory notes that explain each layer using more fundamental ideas.
+  The result is a draft for teacher review, not a published chapter bundle.
+- [Author a chapter](teacher/author-chapter/SKILL.md) prepares a validated chapter bundle
+  for the offline student app.
+
 ## The three stages
 
 1. **Author (teacher, online + AI).** Produce a chapter bundle: `chapter.md` (the lesson,
