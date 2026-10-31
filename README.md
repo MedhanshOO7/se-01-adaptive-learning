@@ -14,3 +14,12 @@ Try the example in [content/reader-demo](content/reader-demo/chapter.config.json
 `npm test` runs the tests; `npm run typecheck` checks TypeScript. Node 24 or later is required. Compilers can be selected as adapters, but a learning build requires them to preserve the chapter's markers and embed local assets. The older `content/fractions` manifest format and its runtime remain supported.
 
 Offline practice stores answers locally, and answer keys ship with the pages. This is not secure examination or learner authentication. Compile trusted Markdown: raw HTML is permitted.
+
+## GitHub Pages
+
+This repository includes `.github/workflows/deploy-pages.yml` to build and deploy `dist/learning` to GitHub Pages on pushes to `main` (or `master`) and on manual runs.
+
+To enable it:
+1. In GitHub, open **Settings → Pages**.
+2. Set **Source** to **GitHub Actions**.
+3. Push to `main` or run the **Deploy to GitHub Pages** workflow manually from **Actions**.
