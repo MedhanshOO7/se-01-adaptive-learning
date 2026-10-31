@@ -18,6 +18,13 @@ export function validateConfig(input: unknown): asserts input is ChapterConfig {
   const c = input as any;
   obj(c,'config'); if(c.schemaVersion!==1) fail('schemaVersion','unsupported version');
   str(c.id,'id'); str(c.revision,'revision'); str(c.title,'title');
+  if (c.cover !== undefined) {
+    obj(c.cover, 'cover');
+    if (Object.keys(c.cover).some(k => !['label', 'color', 'artwork'].includes(k))) fail('cover', 'unknown setting');
+    if (c.cover.label !== undefined) { str(c.cover.label, 'cover.label'); if (c.cover.label.length > 48) fail('cover.label', 'maximum 48 characters'); }
+    if (c.cover.color !== undefined && (typeof c.cover.color !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(c.cover.color))) fail('cover.color', 'expected a six-digit hex color');
+    if (c.cover.artwork !== undefined && !['orbit', 'none'].includes(c.cover.artwork)) fail('cover.artwork', 'expected orbit or none');
+  }
   list(c.topics,'topics'); const topics = ids(c.topics,'topics'); c.topics.forEach((t:any)=>str(t.label,'topic.label'));
   obj(c.hexagon,'hexagon'); list(c.hexagon.axes,'hexagon.axes');
   if(c.hexagon.axes.length!==6) fail('hexagon.axes','define exactly six chapter-specific axes');

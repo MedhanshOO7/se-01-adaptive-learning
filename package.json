@@ -13,7 +13,9 @@
     "build": "node teacher/build/build.ts",
     "bundle:runtime": "node teacher/build/bundle-runtime.ts",
     "serve": "node teacher/build/serve.ts",
-    "test": "node --test"
+    "test": "node --test",
+    "build:learning": "node teacher/build/build.ts content/reader-demo dist/learning",
+    "serve:learning": "node scripts/serve-learning.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

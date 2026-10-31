@@ -22,6 +22,8 @@ export type Condition =
 export interface ChapterConfig {
   schemaVersion: 1; id: string; revision: string; title: string;
   entry: string;
+  /** Optional chapter cover defaults; a reader's saved color takes precedence. */
+  cover?: { label?: string; color?: string; artwork?: 'orbit' | 'none' };
   pages: { file: string; title: string; quizzes: string[] }[];
   topics: Topic[];
   hexagon: {
