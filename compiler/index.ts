@@ -1,6 +1,7 @@
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import engine from './engine.ts';
+import { verifyQuizMounts } from './quiz-mounts.ts';
 import type { CompileInput, MarkdownCompiler } from './types.ts';
 
 export type { CompileInput, MarkdownCompiler } from './types.ts';
@@ -21,5 +22,6 @@ export async function compileMarkdown(input: CompileInput, compiler: MarkdownCom
   if (typeof html !== 'string' || !html.trim()) {
     throw new Error(`Compiler "${compiler.name}" returned empty or invalid HTML.`);
   }
+  await verifyQuizMounts(input.lessonPath, html, compiler.name);
   return html;
 }
