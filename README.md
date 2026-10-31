@@ -12,6 +12,7 @@ The project has a **teacher side** (authoring) and a **student side** (offline l
 They meet at exactly one thing: a **chapter bundle**, built into a standalone HTML file.
 
 ```
+compiler/       replaceable Markdown-to-HTML compiler adapters
 teacher/        authoring — turns a chapter bundle into offline student HTML (needs Bun for mr-md)
 student/        the offline runtime bundled into that HTML (quiz capture, store, adaptation)
 shared/schema/  the bundle contract both sides depend on (types + validators)
@@ -35,7 +36,7 @@ docs/           design docs
    in [mr-md](https://github.com/chirayuChhabra/mr-md) markdown), `quiz/*.json` (curated
    questions, each tagged with a skill), and `skills.json` (a **skill graph** with
    prerequisite edges + a pool of prerequisite questions).
-2. **Build → read (stage 1→2).** `mr-md` renders the bundle to standalone interactive HTML;
+2. **Build → read (stage 1→2).** A replaceable compiler (mr-md by default) renders the bundle to standalone interactive HTML;
    the build injects the student runtime. The student reads it and answers the quizzes.
 3. **Adapt (offline).** Each answer is graded and written to a **tamper-resistant local
    store**. On a wrong answer the runtime steps back along the skill graph and serves a
@@ -54,6 +55,10 @@ npm run typecheck
 npm run validate    # validate content/fractions against the schema
 npm run build       # content/fractions -> dist/ (needs Bun for the mr-md render step)
 ```
+
+The build also accepts other compiler adapters; see [the compiler contract](compiler/README.md). Alternative compilers need compatible quiz integration for adaptive evidence.
+
+To compile an individual Markdown file or preview it live, see [compiler commands](compiler/README.md).
 
 ## How the quiz layer works
 

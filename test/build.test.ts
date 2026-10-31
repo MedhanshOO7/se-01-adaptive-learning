@@ -30,3 +30,31 @@ test('injectRuntime appends when no </body> is present', async () => {
   assert.ok(out.includes('RT_MARKER'));
   assert.ok(out.startsWith('<div>x</div>'));
 });
+
+test('buildChapter uses a supplied compiler and injects the runtime into its HTML', async () => {
+  const { mkdtemp, readFile, rm } = await import('node:fs/promises');
+  const { tmpdir } = await import('node:os');
+  const { join, isAbsolute } = await import('node:path');
+  const { buildChapter } = await import('../teacher/build/build.ts');
+  const dir = await mkdtemp(join(tmpdir(), 'se01-test-'));
+  try {
+    let called = false;
+    const path = await buildChapter('content/fractions', dir, {
+      name: 'test compiler',
+      compile(input) {
+        called = true;
+        assert.ok(isAbsolute(input.lessonPath));
+        assert.ok(isAbsolute(input.bundleDir));
+        return '<html><body><h1>Compiled lesson</h1></body></html>';
+      },
+    });
+    const html = await readFile(path, 'utf8');
+    assert.ok(called);
+    assert.ok(html.includes('<h1>Compiled lesson</h1>'));
+    assert.ok(html.includes('window.__SE01__='));
+    assert.ok(html.indexOf('window.__SE01__=') < html.indexOf('</body>'));
+    await assert.rejects(buildChapter('content/fractions', dir, { name: 'empty', compile: () => '' }), /empty or invalid HTML/);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
