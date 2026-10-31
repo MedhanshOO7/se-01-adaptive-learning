@@ -57,7 +57,7 @@ The versioned contract is [`shared/learning/types.ts`](../shared/learning/types.
 - `topics`: stable topic IDs and student-facing labels.
 - `hexagon.axes`: exactly six chapter-specific axes, each with one or more topic IDs, `average` or `weakest` aggregation and `minEvidence` (distinct answered questions).
 - `hexagon.evidence`: `first` or `latest` response per question. A hint multiplies a correct response's contribution by `hintedCredit` (0–1).
-- `hexagon.evidenceWindow`: number of most recent distinct questions to include per topic, after choosing first/latest responses. The demo uses one so fresh workshop evidence replaces the initial estimate. Increase this to require a broader sample. Responses are ordered by saved event order, not device clock.
+- `hexagon.evidenceWindow`: number of most recent distinct questions to include per topic, after choosing first/latest responses. The reader demo uses five; the fractions fixture uses one so fresh practice evidence replaces the initial estimate. Increase this to require a broader sample. Responses are ordered by saved event order, not device clock.
 - `hexagon.bands`: ascending exclusive numeric thresholds and labels. Values internally run from 0 to 100; the student sees topic bands and the hexagon, without a total mark.
 - `quizzes`: questions, answers, topic links, weights, hints and explanations.
 - `completion.quizzes`: all questions in these checks must have a saved response before recommendations appear. The hexagon appears in the completion pop-up, with unknown skills labeled as not explored. Completion means answered, not mastered.
@@ -102,3 +102,9 @@ The output works without network when opened as local files; it makes no runtime
 ## Verification
 
 Run `npm test` and `npm run typecheck` after making changes.
+
+## Reader-independent engine boundary
+
+`student/learning/controller.ts` exposes saved evidence and results to the reader. Create it with the validated chapter config, a storage implementation and a student profile; `submit(questionId, response, hinted)` validates and saves an attempt before advancing state, while `results()` returns completion, axis values and labels, and the next route. The reader uses this controller, and `shared/learning/engine.ts` owns grading, stats and rule evaluation. Failed writes leave results unchanged. The skills dialog is available on follow-up lessons after chapter completion.
+
+The [fractions fixture](../content/learning-fractions/chapter.config.json) also demonstrates per-topic practice destinations.

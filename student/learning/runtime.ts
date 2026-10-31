@@ -1,5 +1,5 @@
-import { band, complete, grade, parseNumeric, recommend, stats } from '../../shared/learning/engine.ts';
-import type { Attempt, ChapterConfig, LearningState, Question, Response } from '../../shared/learning/types.ts';
+import { createLearningController } from './controller.ts';
+import type { ChapterConfig, Question, Response } from '../../shared/learning/types.ts';
 
 declare global { interface Window { __LEARNING__: { config: ChapterConfig; page: string }; } }
 const escape = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
@@ -9,9 +9,7 @@ export function mountLearning(doc: Document, config: ChapterConfig, page: string
   const activeKey = `se01-learning:active:${config.id}`;
   // Continue an existing local history, while new chapters use the default device history.
   const profile = storage.getItem(activeKey) || 'student';
-  let state: LearningState = { schemaVersion: 1, attempts: [] };
-  let blocked = false;
-  const key = () => `se01-learning:1:${config.id}:${config.revision}:${profile}`;
+  const engine = createLearningController(config, storage, profile);
   // The author's color is a default; a reader's saved preference wins.
   if (config.cover?.color) {
     let savedColor: string | null = null;
@@ -66,18 +64,18 @@ export function mountLearning(doc: Document, config: ChapterConfig, page: string
   dialog.querySelector<HTMLButtonElement>('.le-close')!.onclick = closeResults;
   dialog.addEventListener('close', () => opener?.focus());
   function showResults() {
-    if (!complete(config, state.attempts)) return;
+    if (!engine.results().completed) return;
     opener = doc.activeElement as HTMLElement | null;
     if (typeof dialog.showModal === 'function') dialog.showModal();
     else dialog.setAttribute('open', ''); // DOM test environments may not implement <dialog>.
     dialog.querySelector<HTMLButtonElement>('.le-close')!.focus();
   }
   const finish = doc.createElement('section'); finish.className = 'le-finish';
-  finish.innerHTML = '<span class="le-finish-mark" aria-hidden="true">✳</span><div class="le-finish-copy"><h2>End of chapter</h2><p>Complete the chapter check to see your next step.</p></div>';
-  const finishButton = doc.createElement('button'); finishButton.type = 'button'; finishButton.className = 'le-primary le-finish-button'; finishButton.textContent = 'Complete chapter'; finishButton.onclick = showResults;
+  finish.innerHTML = `<span class="le-finish-mark" aria-hidden="true">✳</span><div class="le-finish-copy"><h2>${page === config.entry ? 'End of chapter' : 'Your chapter progress'}</h2><p>Complete the chapter check to see your next step.</p></div>`;
+  const finishButton = doc.createElement('button'); finishButton.type = 'button'; finishButton.className = 'le-primary le-finish-button'; finishButton.textContent = page === config.entry ? 'Complete chapter' : 'View my skills'; finishButton.onclick = showResults;
   finish.append(finishButton);
   // The chapter stays a normal reading page; the results live only in the modal.
-  if (config.pages.find(p => p.file === page)?.quizzes.some(id => config.completion.quizzes.includes(id))) content.append(finish);
+  content.append(finish);
   const layout = doc.createElement('div'); layout.className = 'le-layout'; layout.append(content);
   app.append(layout, dialog);
 
@@ -85,27 +83,7 @@ export function mountLearning(doc: Document, config: ChapterConfig, page: string
   app.append(notice); doc.body.append(app);
   doc.documentElement.classList.add('le-document');
 
-  function restore() {
-    try {
-      const raw = storage.getItem(key());
-      if (!raw) { state = { schemaVersion: 1, attempts: [] }; return; }
-      const saved = JSON.parse(raw);
-      const questions = config.quizzes.flatMap(q => q.questions);
-      if (saved.schemaVersion !== 1 || !Array.isArray(saved.attempts) || !saved.attempts.every((a: Attempt) =>
-        questions.some(q => q.id === a.questionId) && typeof a.hinted === 'boolean' && typeof a.at === 'string' &&
-        (typeof a.response === 'string' || typeof a.response === 'number' || Array.isArray(a.response)))) throw new Error('Invalid saved progress');
-      state = saved;
-    } catch {
-      state = { schemaVersion: 1, attempts: [] }; blocked = true;
-      notice.textContent = 'Your saved progress could not be read. Your existing record has been kept, and new answers cannot be saved.';
-    }
-  }
-  function save(attempt: Attempt): boolean {
-    if (blocked) return false;
-    const updated = { ...state, attempts: [...state.attempts, attempt] };
-    try { storage.setItem(key(), JSON.stringify(updated)); state = updated; notice.textContent = ''; return true; }
-    catch { notice.textContent = 'Could not save your answer. Free some device storage and try again.'; return false; }
-  }
+  if (engine.error) notice.textContent = engine.error;
 
   function questionUI(q: Question, onSaved: () => void): HTMLElement {
     const box = doc.createElement('fieldset'); box.className = 'le-question'; box.tabIndex = -1;
@@ -115,7 +93,7 @@ export function mountLearning(doc: Document, config: ChapterConfig, page: string
     if (q.level === 'hots') instruction.textContent = 'Think it through. ' + instruction.textContent;
     box.append(instruction);
     let hinted = false;
-    const previous = [...state.attempts].reverse().find(a => a.questionId === q.id);
+    const previous = [...engine.state.attempts].reverse().find(a => a.questionId === q.id);
     const controls = doc.createElement('div'); controls.className = 'le-options'; box.append(controls);
     let read: () => Response;
     if (q.type === 'numeric') {
@@ -163,24 +141,25 @@ export function mountLearning(doc: Document, config: ChapterConfig, page: string
       if (response === '' || response === -1 || (Array.isArray(response) && (!response.length || response.includes(-1) || new Set(response).size !== response.length))) {
         feedback.dataset.tone = 'hint'; feedback.textContent = q.type === 'ordering' ? 'Choose an item for every position, using each item once, then check your answer.' : 'Choose or enter your answer first, then select Check answer.'; return;
       }
-      if (q.type === 'numeric' && parseNumeric(response as string) === null) { feedback.dataset.tone = 'hint'; feedback.textContent = 'Enter a number, or a fraction with a nonzero denominator.'; return; }
-      if (!save({ questionId: q.id, response, hinted, at: new Date().toISOString() })) return;
-      const correct = grade(q, response); feedback.dataset.tone = correct ? 'correct' : 'practice';
+      const result = engine.submit(q.id, response, hinted);
+      notice.textContent = result.error;
+      if (!result.saved) { feedback.dataset.tone = 'hint'; feedback.textContent = result.error; return; }
+      const correct = result.correct; feedback.dataset.tone = correct ? 'correct' : 'practice';
       feedback.innerHTML = `<strong>${correct ? 'You’ve got it.' : 'A little more practice here.'}</strong><p>${escape(q.explanation)}</p>`;
       submit.textContent = 'Check again'; onSaved(); updateSummaries();
     };
     if (previous) {
-      feedback.dataset.tone = grade(q, previous.response) ? 'correct' : 'practice';
-      feedback.innerHTML = `<strong>${grade(q, previous.response) ? 'You’ve got it.' : 'A little more practice here.'}</strong><p>${escape(q.explanation)}</p>`;
+      feedback.dataset.tone = engine.isCorrect(q.id, previous.response) ? 'correct' : 'practice';
+      feedback.innerHTML = `<strong>${engine.isCorrect(q.id, previous.response) ? 'You’ve got it.' : 'A little more practice here.'}</strong><p>${escape(q.explanation)}</p>`;
     }
     box.append(actions, feedback); return box;
   }
 
   function updateSummaries() {
-    const values = stats(config, state.attempts), finished = complete(config, state.attempts);
+    const result = engine.results(), values = result.axes, finished = result.completed;
     finishButton.disabled = !finished;
     finish.querySelector('p')!.textContent = finished ? 'See what you have learned and where to go next.' : 'Complete the chapter check to see your next step.';
-    const answered = new Set(state.attempts.map(a => a.questionId));
+    const answered = new Set(engine.state.attempts.map(a => a.questionId));
     const required = config.quizzes.filter(q => config.completion.quizzes.includes(q.id)).flatMap(q => q.questions);
     const count = required.filter(q => answered.has(q.id)).length;
     summary.className = 'le-summary';
@@ -194,8 +173,8 @@ export function mountLearning(doc: Document, config: ChapterConfig, page: string
       const anchor = i === 1 || i === 2 ? 'start' : i === 4 || i === 5 ? 'end' : 'middle';
       return `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle">${escape(s.label)}</text>`;
     }).join('');
-    summary.innerHTML = `<div class="le-section-heading"><div><p class="le-summary-kicker">YOUR CHAPTER PROFILE</p><h2>Six skills, one picture</h2></div><span>${count}/${required.length} answered</span></div><svg viewBox="0 0 480 450" role="img" aria-label="Six-sided skill profile. See the list below for each skill's result.">${grids}${values.map((_, i) => { const [x, y] = point(i, 152).split(','); return `<line x1="240" y1="225" x2="${x}" y2="${y}" class="le-spoke"/>`; }).join('')}${shape}${points}${labels}</svg><p class="le-profile-caption">${values.some(s => s.value === null) ? 'Some skills need more evidence. Dots show known results.' : 'Each point reflects your answers in this chapter.'}</p><ul class="le-skill-list" aria-label="Skill results">${values.map(s => `<li><span class="le-skill-dot"></span><span>${escape(s.label)}</span><small>${s.value === null ? 'Not explored' : escape(band(config, s.value))}</small></li>`).join('')}</ul>`;
-    next.className = 'le-next'; const route = recommend(config, state.attempts);
+    summary.innerHTML = `<div class="le-section-heading"><div><p class="le-summary-kicker">YOUR CHAPTER PROFILE</p><h2>Six skills, one picture</h2></div><span>${count}/${required.length} answered</span></div><svg viewBox="0 0 480 450" role="img" aria-label="Six-sided skill profile. See the list below for each skill's result.">${grids}${values.map((_, i) => { const [x, y] = point(i, 152).split(','); return `<line x1="240" y1="225" x2="${x}" y2="${y}" class="le-spoke"/>`; }).join('')}${shape}${points}${labels}</svg><p class="le-profile-caption">${values.some(s => s.value === null) ? 'Some skills need more evidence. Dots show known results.' : 'Each point reflects your answers in this chapter.'}</p><ul class="le-skill-list" aria-label="Skill results">${values.map(s => `<li><span class="le-skill-dot"></span><span>${escape(s.label)}</span><small>${s.value === null ? 'Not explored' : escape(s.band)}</small></li>`).join('')}</ul>`;
+    next.className = 'le-next'; const route = result.next;
     if (!route) {
       const localQuiz = content.querySelector<HTMLElement>('[data-learning-quiz]');
       const checkLink = localQuiz ? '#' + localQuiz.id : relativeLink(page, config.pages.find(p => p.quizzes.includes(config.completion.quizzes[0]))!.file) + '#learning-' + config.completion.quizzes[0];
@@ -212,7 +191,7 @@ export function mountLearning(doc: Document, config: ChapterConfig, page: string
       const foundQuiz = config.quizzes.find(q => q.id === mount.dataset.learningQuiz); if (!foundQuiz) return;
       const quiz = foundQuiz;
       mount.className = 'le-quiz'; mount.id = 'learning-' + quiz.id; mount.replaceChildren();
-      const answered = new Set(state.attempts.map(a => a.questionId));
+      const answered = new Set(engine.state.attempts.map(a => a.questionId));
       let current = quiz.questions.findIndex(q => !answered.has(q.id)); if (current < 0) current = quiz.questions.length - 1;
       const heading = doc.createElement('h2'); heading.textContent = quiz.title;
       const progress = doc.createElement('div'); progress.className = 'le-quiz-progress';
@@ -247,7 +226,7 @@ export function mountLearning(doc: Document, config: ChapterConfig, page: string
     updateSummaries();
     // Start in the lesson, even when a saved chapter is complete.
   }
-  restore(); render();
+  render();
 }
 export function relativeLink(from: string, to: string): string {
   const a = from.split('/'); a.pop(); const b = to.split('/');

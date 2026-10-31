@@ -108,3 +108,35 @@ test('ordering moves repeated choices and allows a checked incorrect order to ad
   assert.equal(fields[3].hidden, false);
   dom.window.close();
 });
+
+test('weak chapter result opens practice and practice updates the next recommendation', async () => {
+  const root = 'content/learning-fractions';
+  const config = await loadLearningConfig(root);
+  const chapterHtml = await compileLearningPage(root, 'chapter.md', compiler);
+  const chapter = new JSDOM(chapterHtml, { url: 'https://lesson.test/chapter.html', runScripts: 'dangerously' });
+  const doc = chapter.window.document;
+  for (const [index, q] of config.quizzes[0].questions.entries()) {
+    const field = doc.querySelector('fieldset:not([hidden])')!;
+    if (q.type === 'single') (field.querySelectorAll('input')[index === 0 ? 1 : q.answer as number] as HTMLInputElement).click();
+    else if (q.type === 'multiple') (q.answer as number[]).forEach(i => (field.querySelectorAll('input')[i] as HTMLInputElement).click());
+    else if (q.type === 'ordering') field.querySelectorAll('select').forEach((s, i) => { s.value = String((q.answer as number[])[i]); s.dispatchEvent(new chapter.window.Event('change')); });
+    else (field.querySelector('input') as HTMLInputElement).value = String(q.answer);
+    field.querySelector<HTMLButtonElement>('.le-primary')!.click();
+    doc.querySelector<HTMLButtonElement>('.le-forward')!.click();
+  }
+  doc.querySelector<HTMLButtonElement>('.le-finish-button')!.click();
+  assert.match(doc.querySelector('.le-next a')!.getAttribute('href')!, /lessons\/equal-parts\.html$/);
+  const key = 'se01-learning:1:fractions-learning:1:student';
+  const saved = chapter.window.localStorage.getItem(key)!;
+  const practiceHtml = await compileLearningPage(root, 'lessons/equal-parts.md', compiler);
+  const practice = new JSDOM(practiceHtml, { url: 'https://lesson.test/lessons/equal-parts.html', runScripts: 'dangerously', beforeParse(w) { w.localStorage.setItem(key, saved); } });
+  const pd = practice.window.document;
+  (pd.querySelector('fieldset input') as HTMLInputElement).click();
+  pd.querySelector<HTMLButtonElement>('fieldset .le-primary')!.click();
+  const finish = pd.querySelector<HTMLButtonElement>('.le-finish-button')!;
+  assert.equal(finish.disabled, false);
+  finish.click();
+  assert.equal(pd.querySelector<HTMLDialogElement>('.le-dialog')!.open, true);
+  assert.match(pd.querySelector('.le-next a')!.getAttribute('href')!, /next\.html$/);
+  chapter.window.close(); practice.window.close();
+});
