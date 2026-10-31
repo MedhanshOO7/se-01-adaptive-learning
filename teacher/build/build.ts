@@ -1,14 +1,8 @@
-// Stage 1→2 build: a validated chapter bundle → a standalone, offline student HTML file.
-//
-//   1. load + validate the bundle (fail fast on a broken contract)
-//   2. run mr-md to render the lesson + quizzes to standalone HTML
-//   3. inject the student runtime + config (quizzes, skill graph, secret) into that HTML
-//
-// mr-md needs Bun on the build machine; the produced HTML needs nothing (students run offline).
+// Validate a chapter, compile its Markdown, then inject the student runtime.
 
-import { spawnSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
+import { compileMarkdown, loadCompiler, type MarkdownCompiler } from '../../compiler/index.ts';
 import { loadBundle } from './load.ts';
 import { bundleRuntime } from './bundle-runtime.ts';
 import { validateBundle, type ChapterBundle } from '../../shared/schema/index.ts';
@@ -44,31 +38,7 @@ function resolveSecret(outDir: string): string {
   return secret;
 }
 
-function runMrMd(lessonPath: string, outDir: string): void {
-  const result = spawnSync('bunx', ['mr-md', 'build', lessonPath, '--out', outDir], {
-    stdio: 'inherit',
-    encoding: 'utf8',
-  });
-  if (result.error && (result.error as NodeJS.ErrnoException).code === 'ENOENT') {
-    throw new Error(
-      'mr-md needs Bun, which was not found on PATH.\n' +
-        'Install it (https://bun.sh) and re-run the build. The student runtime and schema ' +
-        'do not need Bun; only this render step does.',
-    );
-  }
-  if (result.status !== 0) throw new Error(`mr-md build failed with exit code ${result.status}.`);
-}
-
-/** Newest .html under a directory (mr-md's output filename isn't fixed across versions). */
-function newestHtml(dir: string): string {
-  const htmls = readdirSync(dir)
-    .filter((f) => f.endsWith('.html') && f !== 'demo.html') // demo.html is our own artifact
-    .map((f) => join(dir, f));
-  if (htmls.length === 0) throw new Error(`mr-md produced no .html file in ${dir}.`);
-  return htmls.sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)[0];
-}
-
-export async function buildChapter(bundleDir: string, outDir: string): Promise<string> {
+export async function buildChapter(bundleDir: string, outDir: string, compiler?: MarkdownCompiler): Promise<string> {
   const bundle = await loadBundle(bundleDir);
   const issues = validateBundle(bundle);
   if (issues.length) {
@@ -79,10 +49,9 @@ export async function buildChapter(bundleDir: string, outDir: string): Promise<s
   const secret = resolveSecret(outDir);
   const runtimeJs = await bundleRuntime();
 
-  runMrMd(join(bundleDir, bundle.manifest.lesson), outDir);
-
-  const htmlPath = newestHtml(outDir);
-  const injected = injectRuntime(readFileSync(htmlPath, 'utf8'), buildConfig(bundle, secret), runtimeJs);
+  const html = await compileMarkdown({ lessonPath: resolve(bundleDir, bundle.manifest.lesson), bundleDir: resolve(bundleDir) }, compiler);
+  const htmlPath = join(outDir, `${basename(bundle.manifest.lesson, '.md')}.html`);
+  const injected = injectRuntime(html, buildConfig(bundle, secret), runtimeJs);
   writeFileSync(htmlPath, injected);
   return htmlPath;
 }
@@ -90,6 +59,7 @@ export async function buildChapter(bundleDir: string, outDir: string): Promise<s
 if (import.meta.url === `file://${process.argv[1]}`) {
   const bundleDir = resolve(process.argv[2] ?? 'content/fractions');
   const outDir = resolve(process.argv[3] ?? 'dist');
-  const htmlPath = await buildChapter(bundleDir, outDir);
+  const compiler = await loadCompiler(process.argv[4]);
+  const htmlPath = await buildChapter(bundleDir, outDir, compiler);
   console.log(`✓ built ${basename(htmlPath)} → ${htmlPath}`);
 }

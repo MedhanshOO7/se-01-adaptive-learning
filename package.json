@@ -24,5 +24,8 @@
   },
   "dependencies": {
     "unpdf": "^2.1.0"
+  },
+  "bin": {
+    "compile": "./compiler/cli.ts"
   }
 }
