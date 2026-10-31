@@ -51,3 +51,17 @@ The current mr-md output can include external font and KaTeX stylesheet links, s
 ## Quiz compatibility
 
 The compiler contract only covers Markdown to HTML. The current student runtime observes mr-md's `.bk-quiz` markup and click behavior. A different compiler can render lessons, but its quizzes will only produce adaptive evidence if it emits compatible markup and behavior. Supporting other quiz formats requires a student-side adapter or a shared quiz contract; merely returning HTML does not provide that integration. Test the generated document offline and verify its interactive features before distributing it.
+
+## Mount points for the future SE-01 quiz engine
+
+Put a mount on its own line in the lesson:
+
+```html
+<div data-se01-quiz="fractions-1"></div>
+```
+
+IDs start with a letter or digit and may contain letters, digits, `.`, `_`, and `-`. Each ID must occur only once in a lesson. The compiler checks that every declared mount appears exactly once in the rendered HTML; a compiler adapter that strips or duplicates it fails with an error. Markers in fenced code examples are ignored. See [the example](quiz-mount-example.md).
+
+The mount is an empty placeholder. The future engine must find `[data-se01-quiz]`, resolve its ID to quiz data, and render into it. There is currently no custom engine or quiz-ID-to-data validation. The ordinary compile command and mr-md watch mode do not inject such an engine. Existing mr-md quizzes and the SE-01 student runtime continue to work as before. For background and the remaining integration work see [the integration design](../docs/custom-quiz-integration.md).
+
+For local experiments, a lesson directory may include a trusted `se01-preview.js` sidecar. When present, `compile lesson.md -w` injects that script into a local preview and reloads when the lesson or sidecar changes. This sidecar is for preview only: ordinary compilation and chapter builds do not include it. A local ignored playground can provide such a sidecar for experimentation.

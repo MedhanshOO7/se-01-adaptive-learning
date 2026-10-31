@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
-import { stat, writeFile } from 'node:fs/promises';
-import { dirname, extname, resolve } from 'node:path';
+import { access, stat, writeFile } from 'node:fs/promises';
+import { dirname, extname, join, resolve } from 'node:path';
+import { watchWithPreview } from './preview.ts';
 import { compileMarkdown, loadCompiler } from './index.ts';
 
 async function main() {
@@ -21,6 +22,12 @@ async function main() {
   const input = { lessonPath, bundleDir: dirname(lessonPath) };
   const engine = await loadCompiler();
   if (flags.length) {
+    const hasPreview = await access(join(input.bundleDir, 'se01-preview.js')).then(() => true, () => false);
+    if (hasPreview) {
+      console.log(`Watching ${lessonPath} with quiz preview. Press Ctrl+C to stop.`);
+      await watchWithPreview(input, engine);
+      return;
+    }
     if (!engine.watch) throw new Error(`Compiler "${engine.name}" does not support watch mode.`);
     console.log(`Watching ${lessonPath} with ${engine.name}. Press Ctrl+C to stop.`);
     await engine.watch(input);
