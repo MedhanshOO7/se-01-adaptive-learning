@@ -2,6 +2,14 @@
 
 The in-house compiler turns a chapter folder into offline lesson pages with questions, a six-skill profile and a recommended next lesson. Students can read, answer and revisit their progress on the same device. The reader includes light and dark themes and an accent picker.
 
+## Demo
+
+A Class 9 "Journey Inside the Atom" chapter, built with `npm run build:e2e`: read the chapter, answer the chapter check (including a deliberately wrong answer to show the feedback), complete the chapter, and see the six-skill radar profile route to a personalised depth.
+
+<video src="docs/media/demo.mp4" controls width="100%"></video>
+
+(If the player above doesn't render, watch/download [docs/media/demo.mp4](docs/media/demo.mp4) directly.)
+
 ```sh
 npm install
 npm run build:learning
